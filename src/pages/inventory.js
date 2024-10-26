@@ -516,7 +516,7 @@ function Inventory() {
                                                 {
                                                     label: 'Attributes',
                                                     key: '1',
-                                                    children: 'Content of Attributes tab',
+                                                    children: <Table dataSource={data}/>,
                                                 },
                                                 {
                                                     label: 'Attribute Value',
