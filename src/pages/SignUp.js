@@ -128,9 +128,9 @@ export default class SignUp extends Component {
         <div className="layout-default ant-layout layout-sign-up">
           <Header>
             <div className="header-col header-brand">
-              <h5>Muse Dashboard</h5>
+              <h5>Nsonga Sales | Inventory</h5>
             </div>
-            <div className="header-col header-nav">
+            {/* <div className="header-col header-nav">
               <Menu mode="horizontal" defaultSelectedKeys={["1"]}>
                 <Menu.Item key="1">
                   <Link to="/dashboard">
@@ -157,20 +157,20 @@ export default class SignUp extends Component {
                   </Link>
                 </Menu.Item>
               </Menu>
-            </div>
-            <div className="header-col header-btn">
+            </div> */}
+            {/* <div className="header-col header-btn">
               <Button type="false">FREE DOWNLOAD</Button>
-            </div>
+            </div> */}
           </Header>
 
           <Content className="p-0">
             <div className="sign-up-header">
               <div className="content">
-                <Title>Sign Up</Title>
-                <p className="text-lg">
+                <Title>Create account for free</Title>
+                {/* <p className="text-lg">
                   Use these awesome forms to login or create new account in your
                   project for free.
-                </p>
+                </p> */}
               </div>
             </div>
 
@@ -220,7 +220,16 @@ export default class SignUp extends Component {
                     { required: true, message: "Please input your password!" },
                   ]}
                 >
-                  <Input placeholder="Passwoed" />
+                  <Input placeholder="Password"  type="password"/>
+                </Form.Item>
+
+                <Form.Item
+                  name="password-confirmation"
+                  rules={[
+                    { required: true, message: "Please input your password!" },
+                  ]}
+                >
+                  <Input placeholder="Re-Type Password"  type="password"/>
                 </Form.Item>
 
                 <Form.Item name="remember" valuePropName="checked">
