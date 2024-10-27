@@ -31,6 +31,8 @@ import {
   InstagramOutlined,
   GithubOutlined,
 } from "@ant-design/icons";
+import apiClient from "../axios-client";
+import axios from 'axios';
 
 const { Title } = Typography;
 const { Header, Footer, Content } = Layout;
@@ -115,13 +117,62 @@ const signin = [
   </svg>,
 ];
 export default class SignUp extends Component {
-  render() {
-    const onFinish = (values) => {
-      console.log("Success:", values);
+  constructor(props){
+    super(props)
+    this.state = {
+      name: '',
+      emaill: '',
+      password: '',
+      passwordConfirmation: '',
+      success:null,
+      error:null
     };
+  }
+  render() {
 
+    const { success, error } = this.state;
+
+    const onFinish = (values) => {
+      console.log(values);
+
+      const payload = {
+          name: values.name,
+          email: values.email,
+          password: values.password,
+          passwordConfirmation : values.passwordConfirmation,
+          remember: values.remember,
+      };
+
+      // Send the payload to the API
+      apiClient.post('/register', payload)
+          .then(response => {
+            console.log('request was sent successfully');
+              console.log(response.data);
+
+              if(response.data.success){
+                this.setState({ 
+                  success: response.data.message, 
+                  error: null ,
+                  name: '',
+                  password: '',
+                  passwordConfirmation: '',
+                  email: ''
+                }); 
+    
+              }else{
+                this.setState({ success: null, error: response.data.data[0] }); 
+              }
+
+          })
+          .catch(err => {
+              console.error('Error:', err);
+              this.setState({ error: err.message });
+          });
+  };
+    
     const onFinishFailed = (errorInfo) => {
       console.log("Failed:", errorInfo);
+      this.setState({error: {required:['All fields are required']}})
     };
     return (
       <>
@@ -191,6 +242,44 @@ export default class SignUp extends Component {
                 </Button>
               </div>
               <p className="text-center my-25 font-semibold text-muted">Or</p>
+              {error && 
+              
+                <div style={{
+                    color: 'red',
+                    backgroundColor: '#ffe6e6', 
+                    border: '1px solid red',
+                    padding: '10px',
+                    borderRadius: '5px',
+                    margin: '10px 0'
+                }}  >
+                  {Object.keys(error).length > 0 ? (
+                    <div>
+                    {Object.keys(error).map((key) => (
+                        <span key={key}>
+                            {error[key].map((msg, index) => (
+                              <>
+                                <span key={index}>{msg}</span><br />
+                              </>
+                            ))}
+                        </span>
+                    ))}
+                </div>
+                  ): ''}
+                </div>
+              }
+              {success && 
+              
+                <div style={{
+                    color: 'green',
+                    backgroundColor: '#e6ffe6', 
+                    border: '1px solid green',
+                    padding: '10px',
+                    borderRadius: '5px',
+                    margin: '10px 0'
+                }}
+
+                >{success}</div>
+              }
               <Form
                 name="basic"
                 initialValues={{ remember: true }}
@@ -199,7 +288,7 @@ export default class SignUp extends Component {
                 className="row-col"
               >
                 <Form.Item
-                  name="Name"
+                  name="name"
                   rules={[
                     { required: true, message: "Please input your username!" },
                   ]}
@@ -224,7 +313,7 @@ export default class SignUp extends Component {
                 </Form.Item>
 
                 <Form.Item
-                  name="password-confirmation"
+                  name="passwordConfirmation"
                   rules={[
                     { required: true, message: "Please input your password!" },
                   ]}
@@ -296,7 +385,8 @@ export default class SignUp extends Component {
             </Menu>
             <p className="copyright">
               {" "}
-              Copyright © 2021 Muse by <a href="#pablo">Creative Tim</a>.{" "}
+                Copyright © {new Date().getFullYear()} Nsonga&trade; Sales &amp; Inventory 
+              {" "}
             </p>
           </Footer>
         </div>

@@ -1,4 +1,5 @@
-import { Switch, Route, Redirect } from "react-router-dom";
+
+import {BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 import Home from "./pages/Home";
 import Tables from "./pages/Tables";
 import Billing from "./pages/Billing";
@@ -12,64 +13,75 @@ import "./assets/styles/main.css";
 import "./assets/styles/responsive.css";
 import Category from "./pages/category";
 import Brand from "./pages/brand";
-import Attributes from "./pages/attributes";
+import Attributtes from "./pages/attributes";
 import Products from "./pages/products";
 import SalesList from "./pages/sales";
 import Inventory from "./pages/inventory";
 import Reports from "./pages/reports";
 import { useEffect, useState } from "react";
+import {AuthProvider} from './components/auth/auth.js'
 
 
 /**
- * 
- * @returns Application redirection routes
+ * Main Application
  */
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuth, setAuth] = useState(false);
+
+  const getItemAsync = (key) => {
+      return new Promise((resolve) => {
+          const value = localStorage.getItem(key);
+          resolve(value);
+      });
+  };
 
   useEffect(() => {
-    // Check for authentication token (or any other method to check logged-in status)
-    const token = sessionStorage.getItem('token'); // or localStorage
-    if (token) {
-      setIsAuthenticated(true);
-    }
-  }, []);
+    const checkAuth = async () => {
+        const token = await getItemAsync('nsonga-auth-token');
+        if (token) {
+            setAuth(true);
+        }
+    };
+        checkAuth();
+    }, []);
 
   return (
+    <AuthProvider >
     <div className="App">
+      <Router >
       <Switch>
-        <Route path="/sign-in" exact component={SignIn} />
+
+        <Route 
+          path="/sign-in" 
+          exact 
+          render={() => {
+            return isAuth ? <Redirect to="/dashboard" /> : <SignIn />
+          }}/>
         <Route path="/sign-up" exact component={SignUp} />
-        
-        <Main>
-          <Route exact path="/dashboard">
-            {isAuthenticated ? <Home /> : <Redirect to="/sign-in" />}
-          </Route>
-          <Route exact path="/category">
-            {isAuthenticated ? <Category /> : <Redirect to="/sign-in" />}
-          </Route>
-          <Route exact path="/brands">
-            {isAuthenticated ? <Brand /> : <Redirect to="/sign-in" />}
-          </Route>
-          <Route exact path="/attributes">
-            {isAuthenticated ? <Attributes /> : <Redirect to="/sign-in" />}
-          </Route>
-          <Route exact path="/products">
-            {isAuthenticated ? <Products /> : <Redirect to="/sign-in" />}
-          </Route>
-          <Route exact path="/sales">
-            {isAuthenticated ? <SalesList /> : <Redirect to="/sign-in" />}
-          </Route>
-          <Route exact path="/inventory">
-            {isAuthenticated ? <Inventory /> : <Redirect to="/sign-in" />}
-          </Route>
-          <Route exact path="/reports">
-            {isAuthenticated ? <Reports /> : <Redirect to="/sign-in" />}
-          </Route>
-          <Redirect from="*" to={isAuthenticated ? "/dashboard" : "/sign-in"} />
+
+        <Main> 
+
+          <Route 
+            exact 
+            path="/dashboard"  
+            render={() => {
+              return isAuth ? <Home />  : <Redirect to="/sign-in" />
+            }}
+          />
+          <Route exact path="/category" component={Category} />
+          <Route exact path="/brands" component={Brand} />
+          <Route exact path="/attributes" component={Attributtes} />
+          <Route exact path="/products" component={Products} />
+          <Route path="/sales" exact component={SalesList} />
+          <Route path="/inventory" exact component={Inventory} />
+          <Route path="/reports" exact component={Reports} />
+
         </Main>
       </Switch>
+
+      </Router>
     </div>
+    </AuthProvider>
   );
 }
 

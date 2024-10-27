@@ -19,6 +19,7 @@ import {
   GithubOutlined,
 } from "@ant-design/icons";
 import apiClient from '../axios-client';
+import Password from "antd/lib/input/Password";
 
 const { Title } = Typography;
 const { Header, Footer, Content } = Layout;
@@ -27,33 +28,52 @@ export default class SignIn extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: null,
+      success: null,
       error: null,
+      isLoading: false,
     };
   }
 
-  // Handle form submission
-  onFinish = async (payload) => {
-    console.log("Success:", payload);
-    try {
-      const response = await apiClient.post('/login', payload);
-      this.setState({ data: response.data, error: null }); // Clear error on success
-      console.log('Login successful:', response.data);
-      // Redirect or perform additional actions here
-    } catch (error) {
-      console.error('Login error:', error);
-      this.setState({ error: "Failed to sign in. Please check your credentials." });
+     onFinish = (values) => {
+      console.log(values);
+
+
+      const payload = {
+        email : values.email,
+        password: values.password,
+        remember: values.remember
+      }
+
+      apiClient.post('/login', payload)
+      .then(response => {
+        console.log(response.data);
+          if(response.data.success){
+            this.setState({
+              success: response.data.message,
+              error: null
+            });
+            
+            localStorage.setItem('nsonga-auth-token',response.data.data.user.token);
+
+          }else{
+            this.setState({
+              success: null,
+              error: response.data.data[0]
+            });
+            localStorage.removeItem('nsonga-auth-token');
+          }
+        }
+      )
     }
-  };
 
   // Handle form submission failure
-  onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-    this.setState({ error: "Please fill in all required fields." });
-  };
+      onFinishFailed = (errorInfo) => {
+        console.log("Failed:", errorInfo);
+        this.setState({ error: {required:['All fields are required to sign in']}});
+      };
 
   render() {
-    const { data, error } = this.state;
+    const { success, error } = this.state;
 
     return (
       <Layout className="layout-default layout-signin">
@@ -69,7 +89,45 @@ export default class SignIn extends Component {
               <Title className="font-regular text-muted" level={5}>
                 Enter your email and password to sign in
               </Title>
-              {error && <p style={{ color: 'red' }}>{error}</p>}
+              {success && 
+              
+              <div style={{
+                  color: 'green',
+                  backgroundColor: '#e6ffe6', 
+                  border: '1px solid green',
+                  padding: '10px',
+                  borderRadius: '5px',
+                  margin: '10px 0'
+              }}
+
+              >{success}</div>
+            }
+              {error && 
+              
+              <div style={{
+                  color: 'red',
+                  backgroundColor: '#ffe6e6', 
+                  border: '1px solid red',
+                  padding: '10px',
+                  borderRadius: '5px',
+                  margin: '10px 0'
+              }}  >
+                {Object.keys(error).length > 0 ? (
+                  <div>
+                  {Object.keys(error).map((key) => (
+                      <span key={key}>
+                          {error[key].map((msg, index) => (
+                            <>
+                              <span key={index}>{msg}</span><br />
+                            </>
+                          ))}
+                      </span>
+                  ))}
+              </div>
+                ): ''}
+              </div>
+            }
+
               <Form
                 onFinish={this.onFinish}
                 onFinishFailed={this.onFinishFailed}
@@ -151,10 +209,11 @@ export default class SignIn extends Component {
               <Link to="#">{<GithubOutlined />}</Link>
             </Menu.Item>
           </Menu>
-          <p className="copyright">
-            {" "}
-            Copyright 2021 Muse by <a href="#pablo">Creative Tim</a>.{" "}
-          </p>
+         <p className="copyright">
+              {" "}
+                Copyright © {new Date().getFullYear()} Nsonga&trade; Sales &amp; Inventory 
+              {" "}
+            </p>
         </Footer>
       </Layout>
     );
