@@ -33,6 +33,7 @@ import {
 } from "@ant-design/icons";
 import apiClient from "../axios-client";
 import axios from 'axios';
+import Loader from '../components/loader/Loader';
 
 const { Title } = Typography;
 const { Header, Footer, Content } = Layout;
@@ -125,7 +126,8 @@ export default class SignUp extends Component {
       password: '',
       passwordConfirmation: '',
       success:null,
-      error:null
+      error:null,
+      isLoading: false
     };
   }
   render() {
@@ -133,6 +135,7 @@ export default class SignUp extends Component {
     const { success, error } = this.state;
 
     const onFinish = (values) => {
+      this.setState({isLoading:true})
       console.log(values);
 
       const payload = {
@@ -156,17 +159,24 @@ export default class SignUp extends Component {
                   name: '',
                   password: '',
                   passwordConfirmation: '',
-                  email: ''
-                }); 
+                  email: '',
+                  isLoading: false
+                });
+                
+              localStorage.setItem('nsonga-auth-token', response.data.data.user.token);
+              localStorage.setItem('showLoginToast', 'true');
+
+              this.props.setAuth(true);  // Call setAuth to update App's isAuth state
+
     
               }else{
-                this.setState({ success: null, error: response.data.data[0] }); 
+                  this.setState({ success: null, error: response.data.data[0] ,isLoading:false}); 
               }
 
           })
           .catch(err => {
               console.error('Error:', err);
-              this.setState({ error: err.message });
+              // this.setState({ error: err.message });
           });
   };
     
@@ -177,6 +187,7 @@ export default class SignUp extends Component {
     return (
       <>
         <div className="layout-default ant-layout layout-sign-up">
+          {this.state.isLoading && <Loader />}
           <Header>
             <div className="header-col header-brand">
               <h5>Nsonga Sales | Inventory</h5>
@@ -217,7 +228,7 @@ export default class SignUp extends Component {
           <Content className="p-0">
             <div className="sign-up-header">
               <div className="content">
-                <Title>Create account for free</Title>
+                <Title>Create account </Title>
                 {/* <p className="text-lg">
                   Use these awesome forms to login or create new account in your
                   project for free.

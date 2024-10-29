@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import { Link , useNavigate } from "react-router-dom";
+import Loader from "../components/loader/Loader";
+import { useAuth } from "../components/auth/auth";
 import {
   Layout,
   Menu,
@@ -24,6 +26,8 @@ import Password from "antd/lib/input/Password";
 const { Title } = Typography;
 const { Header, Footer, Content } = Layout;
 
+// const auth = useAuth();
+
 export default class SignIn extends Component {
   constructor(props) {
     super(props);
@@ -33,38 +37,42 @@ export default class SignIn extends Component {
       isLoading: false,
     };
   }
-
-     onFinish = (values) => {
-      console.log(values);
-
-
-      const payload = {
-        email : values.email,
-        password: values.password,
-        remember: values.remember
-      }
-
-      apiClient.post('/login', payload)
+  onFinish = (values) => {
+    console.log(values);
+    this.setState({ isLoading: true });
+  
+    const payload = {
+      email: values.email,
+      password: values.password,
+      remember: values.remember,
+    };
+  
+    apiClient.post('/login', payload)
       .then(response => {
         console.log(response.data);
-          if(response.data.success){
-            this.setState({
-              success: response.data.message,
-              error: null
-            });
-            
-            localStorage.setItem('nsonga-auth-token',response.data.data.user.token);
+        if (response.data.success) {
+          this.setState({
+            success: response.data.message,
+            error: null,
+            isLoading: false,
+          });
+          
+          localStorage.setItem('nsonga-auth-token', response.data.data.user.token);
+          localStorage.setItem('showLoginToast', 'true');
 
-          }else{
-            this.setState({
-              success: null,
-              error: response.data.data[0]
-            });
-            localStorage.removeItem('nsonga-auth-token');
-          }
+          this.props.setAuth(true);  // Call setAuth to update App's isAuth state
+  
+        } else {
+          this.setState({
+            success: null,
+            error: response.data.data[0],
+            isLoading: false,
+          });
+          localStorage.removeItem('nsonga-auth-token');
         }
-      )
-    }
+      });
+  }
+  
 
   // Handle form submission failure
       onFinishFailed = (errorInfo) => {
@@ -73,10 +81,11 @@ export default class SignIn extends Component {
       };
 
   render() {
-    const { success, error } = this.state;
+    const { success, error ,isLoading} = this.state;
 
     return (
       <Layout className="layout-default layout-signin">
+        {isLoading && <Loader />}
         <Header>
           <div className="header-col header-brand">
             <h5>Nsonga Sales | Inventory</h5>

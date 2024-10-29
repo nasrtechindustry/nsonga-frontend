@@ -15,7 +15,12 @@ import {
   Drawer,
   Typography,
   Switch,
+  notification
 } from "antd";
+import { useHistory  } from 'react-router-dom';
+import { useAuth } from "../auth/auth";
+// import withAuth from "../auth/withAuth";
+
 
 import {
   SearchOutlined,
@@ -258,7 +263,28 @@ function Header({
   const showDrawer = () => setVisible(true);
   const hideDrawer = () => setVisible(false);
 
+  const history = useHistory(); 
+  const  auth  = useAuth();
+
+
+   const logout = () =>{
+
+     localStorage.removeItem('nsonga-auth-token'); 
+     auth.logout();
+
+     notification.success({
+       message: 'Logout Successful',
+       description: 'You have been successfully logged out.',
+       placement: 'topRight',
+     });
+      setTimeout(()=>{
+        window.location.replace('/sign-in');
+      },300)
+
+  }
+
   return (
+     
     <>
       <div className="setting-drwer" onClick={showDrawer}>
         {setting}
@@ -287,6 +313,8 @@ function Header({
           <Button type="link" onClick={showDrawer}>
             {logsetting}
           </Button>
+          
+
           <Button
             type="link"
             className="sidebar-toggler"
@@ -382,10 +410,13 @@ function Header({
               </div>
             </div>
           </Drawer>
-          <Link to="/sign-in" className="btn-sign-in">
+          <Link to="#" className="btn-sign-in" onClick={logout}>
             {profile}
             <span>Logout</span>
           </Link>
+          {/* <Button onClick={logout} type="primary">
+            Logout
+          </Button> */}
           <Input
             className="header-search"
             placeholder="Type here..."
