@@ -19,6 +19,9 @@ import profilavatar from "../assets/images/face-1.jpg";
 
 import { Link } from "react-router-dom";
 import { BackwardFilled } from "@ant-design/icons";
+import apiClient from "../axios-client";
+import { useState } from "react";
+import Loader from "../components/loader/Loader";
 
 const dataSource = [
     {
@@ -53,7 +56,6 @@ const columns = [
             <>
                 <Button
                     type="text"
-
                     icon={<EditOutlined style={{ color: 'orange' }} />}
                     onClick={() => handleEdit(record.key)}
                     style={{ padding: 2, width: 'auto' }}
@@ -84,16 +86,38 @@ const handleEdit = (key) => {
 
 
 function Category() {
+    const [isLoading,setLoading] = useState(false)
+
     const [form] = Form.useForm();
-    const onFinish = () => {
-        message.success('Submit success!');
+    const onFinish = (values) => {
+        setLoading(true)
+        const payload = {
+            category_name : values.category_name
+        }
+        apiClient.post('/categories',payload)
+        .then(response => {
+            console.log(response.data);
+            setLoading(false)
+            if(response.data.success){
+                message.success(response.data.message);
+            }else{
+                message.error('Fail to add new category');
+            }
+
+        })
+        .catch(err => {
+            setLoading(false)
+            message.error('Server Error!');
+            throw new Error(err);
+        })
+        console.log(payload);
     };
     const onFinishFailed = () => {
-        message.error('Submit failed!');
+        message.error('Category name is required');
     };
     const onFill = () => {
         form.setFieldsValue({
-            name: 'Destainer',
+            category_name: 'something else',
         });
     };
     // const onChange = (e) => console.log(`radio checked:${e.target.value}`);
@@ -140,6 +164,8 @@ function Category() {
                 }
             ></Card>
 
+            {isLoading && <Loader />}
+
             <Row gutter={[24, 0]}>
                 <Col span={24} md={16} className="mb-24 ">
                     <Card
@@ -177,7 +203,7 @@ function Category() {
                             autoComplete="on"
                         >
                             <Form.Item
-                                name="name"
+                                name="category_name"
                                 label="Name"
                                 rules={[
                                     {
@@ -189,7 +215,7 @@ function Category() {
                                     },
                                     {
                                         type: 'string',
-                                        min: 6,
+                                        // min: 6,
                                     },
                                 ]}
                             >

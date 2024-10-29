@@ -2,9 +2,7 @@ import React, { Component } from "react";
 import { Link , useNavigate } from "react-router-dom";
 import Loader from "../components/loader/Loader";
 import { useAuth } from "../components/auth/auth";
-import {
-  Layout,
-  Menu,
+import {Layout,Menu,
   Button,
   Row,
   Col,
@@ -37,8 +35,9 @@ export default class SignIn extends Component {
       isLoading: false,
     };
   }
+
   onFinish = (values) => {
-    console.log(values);
+    // console.log(values);
     this.setState({ isLoading: true });
   
     const payload = {
@@ -49,7 +48,7 @@ export default class SignIn extends Component {
   
     apiClient.post('/login', payload)
       .then(response => {
-        console.log(response.data);
+        // console.log(response.data);
         if (response.data.success) {
           this.setState({
             success: response.data.message,
@@ -76,7 +75,7 @@ export default class SignIn extends Component {
 
   // Handle form submission failure
       onFinishFailed = (errorInfo) => {
-        console.log("Failed:", errorInfo);
+        // console.log("Failed:", errorInfo);
         this.setState({ error: {required:['All fields are required to sign in']}});
       };
 
@@ -113,9 +112,7 @@ export default class SignIn extends Component {
             }
               {error && 
               
-              <div style={{
-                  color: 'red',
-                  backgroundColor: '#ffe6e6', 
+              <div style={{ color: 'red', backgroundColor: '#ffe6e6', 
                   border: '1px solid red',
                   padding: '10px',
                   borderRadius: '5px',

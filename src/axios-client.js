@@ -40,9 +40,9 @@ apiClient.interceptors.response.use(
             if (response) {
                 if (response.status === 401) {
                     // Handle unauthorized access
-                    localStorage.removeItem('token');
-                    // Optionally redirect to login or show a message
-                    console.error('Unauthorized, redirecting to login...');
+                    localStorage.removeItem('nsonga-auth-token');
+
+                    console.error('Unauthorized');
                 } else if (response.status === 403) {
                     console.error('Forbidden access');
                 } else {
