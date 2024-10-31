@@ -1,128 +1,181 @@
+import React, { useEffect, useState } from "react";
 import {
     Row,
     Col,
     Table,
     Card,
-    Avatar,
+    Button,
+    Form,
+    Input,
+    message,
+    Space,
+    Modal,
     Radio,
-    Button, Form, Input, message, Space
-
 } from "antd";
-
-
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import axios from "axios";
 import BgProfile from "../assets/images/bg-profile.jpg";
-import profilavatar from "../assets/images/face-1.jpg";
-import { DeleteOutlined, EditOutlined, ToTopOutlined } from "@ant-design/icons";
 
-
-
-
-
-import { Link } from "react-router-dom";
-import { BackwardFilled } from "@ant-design/icons";
-
-const dataSource = [
-    {
-        key: '1',
-        id: '#001',
-        name: 'Nsoga Brand 003',
-        action: '.',
-    },
-    {
-        key: '2',
-        id: '#002',
-        name: 'Nsonga Brand 007',
-        action: '.',
-    },
-];
-
-const columns = [
-    {
-        title: 'SN',
-        dataIndex: 'id',
-        key: 'is',
-    },
-    {
-        title: 'Name',
-        dataIndex: 'name',
-        key: 'name',
-    },
-    {
-        title: "Actions",
-        key: "actions",
-        render: (_, record) => (
-            <>
-                <Button
-                    type="text"
-
-                    icon={<EditOutlined style={{ color: 'orange' }} />}
-                    onClick={() => handleEdit(record.key)}
-                    style={{ padding: 2, width: 'auto' }}
-                />
-                <Button
-                    type="text"
-                    icon={<DeleteOutlined style={{ color: 'red' }} />}
-                    onClick={() => handleDelete(record.key)}
-                    style={{ padding: 0, width: 'auto' }}
-                />
-            </>
-
-        ),
-    },
-];
-
-// Your delete handler function
-const handleDelete = (key) => {
-    // Logic to delete the row
-    console.log('Delete record with key:', key);
-    // Add your delete logic here, such as updating the state or calling an API
-};
-
-const handleEdit = (key) => {
-    console.log('Edit record with key:', key);
-}
-
-
-
-function Brand() {
+const Brand = () => {
     const [form] = Form.useForm();
-    const onFinish = () => {
-        message.success('Submit success!');
+    const [dataSource, setDataSource] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState(false);
+    const [pagination, setPagination] = useState({
+        current: 1,
+        pageSize: 3,
+    });
+
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [selectedBrand, setSelectedBrand] = useState(null);
+
+    // Fetch brands from the API
+    const fetchBrands = async (page = 1, pageSize = 3) => {
+        setLoading(true);
+        try {
+            const response = await axios.get("http://localhost:8000/api/brands", {
+                params: { page, pageSize },
+            });
+            setDataSource(response.data); // Adjust based on your API response structure
+            setPagination({
+                current: page,
+                pageSize: pageSize,
+                total: response.total, // Total number of brands from the API response
+            });
+        } catch (error) {
+            message.error("Failed to fetch brands");
+        } finally {
+            setLoading(false);
+        }
     };
-    const onFinishFailed = () => {
-        message.error('Submit failed!');
+
+    useEffect(() => {
+        fetchBrands();
+    }, []);
+
+    // Handle Add Brand
+    const onFinish = async (values) => {
+        setActionLoading(true);
+        try {
+            const response = await axios.post("http://localhost:8000/api/brands", values);
+            message.success("Brand added successfully!");
+            setDataSource([...dataSource, response.data]); // Add the new brand to the state
+            form.resetFields(); // Reset form fields
+            fetchBrands(pagination.current, pagination.pageSize); // Refresh brands
+        } catch (error) {
+            message.error("Failed to add brand");
+            message.warn("The brand name exists, it should be unique!");
+        } finally {
+            setActionLoading(false);
+        }
     };
+
     const onFill = () => {
         form.setFieldsValue({
             name: 'Destainer',
         });
     };
-    // const onChange = (e) => console.log(`radio checked:${e.target.value}`);
+
+    // Handle Edit button click
+    const handleEdit = (brand) => {
+        setSelectedBrand(brand);
+        setIsEditModalOpen(true);
+        form.setFieldsValue({ name: brand.name });
+    };
+
+    const handleTableChange = (pagination) => {
+        fetchBrands(pagination.current, pagination.pageSize);
+    };
+
+    // Confirm Edit
+    const handleEditConfirm = async () => {
+        try {
+            const updatedBrand = form.getFieldValue("name");
+            await axios.put(`http://localhost:8000/api/brands/${selectedBrand.id}`, {
+                name: updatedBrand,
+            });
+            message.success("Brand updated successfully!");
+            setDataSource((prevData) =>
+                prevData.map((item) => (item.id === selectedBrand.id ? { ...item, name: updatedBrand } : item))
+            );
+            setIsEditModalOpen(false);
+        } catch (error) {
+            message.error("Failed to update brand");
+        }
+    };
+
+    // Handle Delete button click
+    const handleDelete = (brand) => {
+        setSelectedBrand(brand);
+        setIsDeleteModalOpen(true);
+    };
+
+    // Confirm Delete
+    const handleDeleteConfirm = async () => {
+        setActionLoading(true);
+        try {
+            await axios.delete(`http://localhost:8000/api/brands/${selectedBrand.id}`);
+            message.success("Brand deleted successfully!");
+            setDataSource((prevData) =>
+                prevData.filter((item) => item.id !== selectedBrand.id)
+            );
+            setIsDeleteModalOpen(false);
+        } catch (error) {
+            message.error("Failed to delete brand");
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const columns = [
+        {
+            title: "SN",
+            dataIndex: "id",
+            key: "id",
+        },
+        {
+            title: "Name",
+            dataIndex: "name",
+            key: "name",
+        },
+        {
+            title: "Actions",
+            key: "actions",
+            render: (_, record) => (
+                <Space size="middle">
+                    <Button
+                        type="text"
+                        icon={<EditOutlined style={{ color: "orange" }} />}
+                        onClick={() => handleEdit(record)}
+                        style={{ padding: 2 }}
+                    />
+                    <Button
+                        type="text"
+                        icon={<DeleteOutlined style={{ color: "red" }} />}
+                        onClick={() => handleDelete(record)}
+                        style={{ padding: 2 }}
+                        loading={actionLoading}
+                    />
+                </Space>
+            ),
+        },
+    ];
 
     return (
-
-
         <>
             <div
                 className="profile-nav-bg"
-                style={{ backgroundImage: "url(" + BgProfile + ")" }}
+                style={{backgroundImage: "url(" + BgProfile + ")"}}
             ></div>
 
             <Card
                 className="card-profile-head"
-                bodyStyle={{ display: "none" }}
+                bodyStyle={{display: "none"}}
                 title={
                     <Row justify="space-between" align="middle" gutter={[24, 0]}>
                         <Col span={24} md={12} className="col-info">
-                            {/* <Avatar.Group>
-                                <Avatar size={74} shape="square" src={profilavatar} />
-
-                                <div className="avatar-info">
-                                    <h4 className="font-semibold m-0">Sarah Jacob</h4>
-                                    <p>CEO / Co-Founder</p>
-                                </div>
-                            </Avatar.Group> */}
-                        </Col >
+                        </Col>
                         <Col
                             span={24}
                             md={12}
@@ -133,89 +186,107 @@ function Brand() {
                             }}
                         >
                             <Radio.Group defaultValue="a">
-                                <Radio.Button value="a">BRANDS</Radio.Button>
+                                <Radio.Button value="a">Attributes</Radio.Button>
                                 <Radio.Button value="c">DEPRICATED</Radio.Button>
                             </Radio.Group>
                         </Col>
-                    </Row >
+                    </Row>
                 }
-            ></Card >
+            ></Card>
 
             <Row gutter={[24, 0]}>
-                <Col span={24} md={16} className="mb-24 ">
+                <Col span={24} md={16} className="mb-24">
                     <Card
                         bordered={false}
                         className="header-solid h-full"
                         title={<h6 className="font-semibold m-0">Brands List</h6>}
                     >
-                        <div className="table-responsive">
-                            <Table
-                                dataSource={dataSource}
-                                columns={columns}
-                                className="ant-border-space"
-                            />
-                        </div>
+                        <Table
+                            dataSource={dataSource}
+                            columns={columns}
+                            loading={loading}
+                            rowKey="id"
+                            pagination={{
+                                current: pagination.current,
+                                pageSize: pagination.pageSize,
+                                total: pagination.total,
+                                showSizeChanger: true,
+                                onChange: (page, pageSize) => {
+                                    fetchBrands(page, pageSize);
+                                },
+                            }}
+                            onChange={handleTableChange}
+                            className="ant-border-space"
+                        />
                     </Card>
                 </Col>
-
 
                 <Col span={24} md={8} className="mb-24">
                     <Card
                         bordered={false}
                         title={<h6 className="font-semibold m-0">Add New Brand</h6>}
                         className="header-solid h-full card-profile-information"
-
-                        bodyStyle={{ paddingTop: 0, paddingBottom: 16 }}
+                        bodyStyle={{paddingTop: 0, paddingBottom: 16}}
                     >
-
-                        <hr className="my-25" />
-
                         <Form
                             form={form}
                             layout="vertical"
                             onFinish={onFinish}
-                            onFinishFailed={onFinishFailed}
                             autoComplete="on"
                         >
                             <Form.Item
                                 name="name"
                                 label="Name"
-                                rules={[
-                                    {
-                                        required: true,
-                                    },
-                                    {
-                                        type: 'name',
-                                        warningOnly: true,
-                                    },
-                                    {
-                                        type: 'string',
-                                        min: 6,
-                                    },
-                                ]}
+                                rules={[{required: true, message: "Please enter the brand name!"}]}
                             >
-                                <Input placeholder="Enter Category name" />
+                                <Input placeholder="Enter brand name"/>
                             </Form.Item>
                             <Form.Item>
                                 <Space>
                                     <Button style={{ backgroundColor: '#0E1573', borderColor: '#0E1573', color: '#fff' }} htmlType="submit">
                                         Submit
                                     </Button>
-
                                     <Button htmlType="button" onClick={onFill}>
                                         Fill
                                     </Button>
                                 </Space>
                             </Form.Item>
                         </Form>
-
                     </Card>
                 </Col>
-
             </Row>
 
+            {/* Edit Modal */}
+            <Modal
+                title="Edit Brand"
+                open={isEditModalOpen}
+                onOk={handleEditConfirm}
+                onCancel={() => setIsEditModalOpen(false)}
+            >
+                <Form form={form} layout="vertical">
+                    <Form.Item
+                        name="name"
+                        label="Brand Name"
+                        rules={[{ required: true, message: "Please enter the brand name!" }]}
+                    >
+                        <Input />
+                    </Form.Item>
+                </Form>
+            </Modal>
+
+            {/* Delete Confirmation Modal */}
+            <Modal
+                title="Confirm Delete"
+                open={isDeleteModalOpen}
+                onOk={handleDeleteConfirm}
+                onCancel={() => setIsDeleteModalOpen(false)}
+                okText="Delete"
+                okButtonProps={{ danger: true }}
+            >
+                <p>Are you sure you want to delete this brand?</p>
+            </Modal>
         </>
     );
-}
+};
 
 export default Brand;

@@ -141,7 +141,7 @@ function Attributes() {
                             }}
                         >
                             <Radio.Group defaultValue="a">
-                                <Radio.Button value="a">AttributesS</Radio.Button>
+                                <Radio.Button value="a">Attributes</Radio.Button>
                                 <Radio.Button value="c">DEPRICATED</Radio.Button>
                             </Radio.Group>
                         </Col>
