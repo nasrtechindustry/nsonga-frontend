@@ -43,17 +43,27 @@ apiClient.interceptors.response.use(
                     localStorage.removeItem('nsonga-auth-token');
 
                     console.error('Unauthorized');
+
                 } else if (response.status === 403) {
+
                     console.error('Forbidden access');
+
                 } else {
+
                     console.error('An error occurred:', response.data);
+
                 }
             } else {
+
                 console.error('Network error or server not responding:', err);
+
             }
         } catch (e) {
+
             console.error('Error handling response:', e);
+
         }
+        
         return Promise.reject(err); // Reject the promise to handle it in the calling code
     }
 );

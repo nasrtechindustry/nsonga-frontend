@@ -44,7 +44,7 @@ function App() {
             setAuth(true);
         }
     };
-        checkAuth();
+       return  checkAuth();
     }, []);
 
   return (

@@ -1,34 +1,8 @@
-
-
 import { useState, useEffect } from "react";
-
-import {
-  Row,
-  Col,
-  Breadcrumb,
-  Badge,
-  Dropdown,
-  Button,
-  List,
-  Avatar,
-  Input,
-  Drawer,
-  Typography,
-  Switch,
-  notification
-} from "antd";
+import { Row, Col, Badge, Dropdown, Button, List, Avatar, Input, Drawer, Typography, Switch, Breadcrumb, notification} from "antd";
 import { useHistory  } from 'react-router-dom';
 import { useAuth } from "../auth/auth";
-// import withAuth from "../auth/withAuth";
-
-
-import {
-  SearchOutlined,
-  StarOutlined,
-  TwitterOutlined,
-  FacebookFilled,
-} from "@ant-design/icons";
-
+import { SearchOutlined, StarOutlined, TwitterOutlined, FacebookFilled,} from "@ant-design/icons";
 import { NavLink, Link } from "react-router-dom";
 import styled from "styled-components";
 import avtar from "../../assets/images/team-2.jpg";
@@ -269,8 +243,13 @@ function Header({
 
    const logout = () =>{
 
-     localStorage.removeItem('nsonga-auth-token'); 
-     auth.logout();
+     
+      localStorage.removeItem('nsonga-auth-token');       
+     
+
+     
+      auth.logout();
+     
 
      notification.success({
        message: 'Logout Successful',
@@ -328,7 +307,7 @@ function Header({
             width={360}
             onClose={hideDrawer}
             placement={placement}
-            visible={visible}
+            open={visible}
           >
             <div layout="vertical">
               <div className="header-top">
