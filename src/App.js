@@ -13,7 +13,7 @@ import "./assets/styles/main.css";
 import "./assets/styles/responsive.css";
 import Category from "./pages/category";
 import Brand from "./pages/brand";
-import Attributtes from "./pages/attributes";
+import Attributtes from "./pages/attributes/attributes";
 import Products from "./pages/products";
 import SalesList from "./pages/sales";
 import Inventory from "./pages/inventory";
@@ -81,7 +81,7 @@ function App() {
           <Redirect to="/sign-in" />
         )}
 
-        <Route component={NotFound} />  //Almost to cry why this route is never matched if no url
+        <Route component={NotFound} /> 
 
 
       </Switch>

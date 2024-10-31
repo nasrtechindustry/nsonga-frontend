@@ -49,7 +49,7 @@ export default class SignIn extends Component {
   
     apiClient.post('/login', payload)
       .then(response => {
-        console.log(response.data);
+      
         if (response.data.success) {
           this.setState({
             success: response.data.message,
