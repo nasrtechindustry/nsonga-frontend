@@ -5,11 +5,8 @@
  */
 export default function Loader(){
     return (
-        <div className="loader">
-            <div className="bar"></div>
-            <div className="bar"></div>
-            <div className="bar"></div>
+        <div className='loader-cont'>
+            <div className="loader"></div>
         </div>
-
     )
 }

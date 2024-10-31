@@ -12,7 +12,7 @@ import "antd/dist/antd.css";
 import "./assets/styles/main.css";
 import "./assets/styles/responsive.css";
 import Category from "./pages/category";
-import Brand from "./pages/brand";
+import Brand from "./pages/brand";  
 import Attributtes from "./pages/attributes/attributes";
 import Products from "./pages/products";
 import SalesList from "./pages/sales";
@@ -28,9 +28,8 @@ import NotFound from './components/notfound/NotFound.js'
  * Main Application
  */
 function App() {
+
   const [isAuth, setAuth] = useState(false);
-
-
   const getItemAsync = (key) => {
       return new Promise((resolve) => {
           const value = localStorage.getItem(key);
@@ -45,49 +44,48 @@ function App() {
             setAuth(true);
         }
     };
-        checkAuth();
+       return  checkAuth();
     }, []);
 
   return (
     <AuthProvider >
-    <div className="App">
-    <Router>
-      <Switch>
-        <Route 
-          path="/sign-in" 
-          exact 
-          render={() => (isAuth ? <Redirect to="/dashboard" /> : <SignIn setAuth={setAuth}/>)}
-        />
-        <Route 
-          path="/sign-up" 
-          exact 
-          render={() => (isAuth ? <Redirect to="/dashboard" /> : <SignUp setAuth={setAuth}/>)}
-        />
+      <div className="App">
+        <Router>
+          <Switch>
+            <Route 
+              path="/sign-in" 
+              exact 
+              render={() => (isAuth ? <Redirect to="/dashboard" /> : <SignIn setAuth={setAuth}/>)}
+            />
+            <Route 
+              path="/sign-up" 
+              exact 
+              render={() => (isAuth ? <Redirect to="/dashboard" /> : <SignUp setAuth={setAuth}/>)}
+            />
 
-        {isAuth ? (
-          <Main>
-            <Switch>
-              <Route exact path="/dashboard" component={Home} />
-              <Route exact path="/category" component={Category} />
-              <Route exact path="/brands" component={Brand} />
-              <Route exact path="/attributes" component={Attributtes} />
-              <Route exact path="/products" component={Products} />
-              <Route exact path="/sales" component={SalesList} />
-              <Route exact path="/inventory" component={Inventory} />
-              <Route exact path="/reports" component={Reports} />
-            </Switch>
-          </Main>
-        ) : (
-          <Redirect to="/sign-in" />
-        )}
+            {isAuth ? (
+              <Main>
+                <Switch>
+                  <Route exact path="/dashboard" component={Home} />
+                  <Route exact path="/category" component={Category} />
+                  <Route exact path="/brands" component={Brand} />
+                  <Route exact path="/attributes" component={Attributtes} />
+                  <Route exact path="/products" component={Products} />
+                  <Route exact path="/sales" component={SalesList} />
+                  <Route exact path="/inventory" component={Inventory} />
+                  <Route exact path="/reports" component={Reports} />
+                </Switch>
+              </Main>
+            ) : (
+              <Redirect to="/sign-in" />
+            )}
 
-        <Route component={NotFound} /> 
+            <Route path="*" component={NotFound} />  //Almost to cry why this route is never matched if no url
 
 
-      </Switch>
-    </Router>
-
-    </div>
+          </Switch>
+        </Router>
+      </div>
     </AuthProvider>
   );
 }

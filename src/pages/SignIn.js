@@ -2,32 +2,19 @@ import React, { Component } from "react";
 import { Link , useNavigate } from "react-router-dom";
 import Loader from "../components/loader/Loader";
 import { useAuth } from "../components/auth/auth";
-import {
-  Layout,
-  Menu,
-  Button,
-  Row,
-  Col,
-  Typography,
-  Form,
-  Input,
-  Switch,
-} from "antd";
+import {Layout,Menu, Button, Row, Col, Typography, Form, Input, Switch ,notification,message} from "antd";
 import signinbg from "../assets/images/nsonga-login-1.avif";
-import {
-  DribbbleOutlined,
-  TwitterOutlined,
-  InstagramOutlined,
-  GithubOutlined,
-} from "@ant-design/icons";
+import { DribbbleOutlined, TwitterOutlined, InstagramOutlined, GithubOutlined } from "@ant-design/icons";
 import apiClient from '../axios-client';
 import Password from "antd/lib/input/Password";
 
 const { Title } = Typography;
 const { Header, Footer, Content } = Layout;
 
-// const auth = useAuth();
 
+/**
+ * Sign in Component Class
+ */
 export default class SignIn extends Component {
   constructor(props) {
     super(props);
@@ -37,8 +24,9 @@ export default class SignIn extends Component {
       isLoading: false,
     };
   }
+
   onFinish = (values) => {
-    console.log(values);
+    // console.log(values);
     this.setState({ isLoading: true });
   
     const payload = {
@@ -49,7 +37,7 @@ export default class SignIn extends Component {
   
     apiClient.post('/login', payload)
       .then(response => {
-      
+        // console.log(response.data);
         if (response.data.success) {
           this.setState({
             success: response.data.message,
@@ -63,11 +51,22 @@ export default class SignIn extends Component {
           this.props.setAuth(true);  // Call setAuth to update App's isAuth state
   
         } else {
+          const errorDics = response.data.data[0]
+          for (let i in errorDics){
+            let error  =  errorDics[i]
+            // notification.error({
+            //   description: error ,
+            //   placement: 'topRight',
+            // });
+            message.error(error)
+            
+          }
           this.setState({
-            success: null,
+            success: null,                                                      
             error: response.data.data[0],
             isLoading: false,
           });
+          
           localStorage.removeItem('nsonga-auth-token');
         }
       });
@@ -75,9 +74,13 @@ export default class SignIn extends Component {
   
 
   // Handle form submission failure
-      onFinishFailed = (errorInfo) => {
-        console.log("Failed:", errorInfo);
-        this.setState({ error: {required:['All fields are required to sign in']}});
+      onFinishFailed = () => {
+        // console.log("Failed:", errorInfo);
+        notification.error({
+          message: 'Fields are mandatory',
+          description: 'All Fields are required',
+          placement: 'topRight',
+        });
       };
 
   render() {
@@ -111,20 +114,18 @@ export default class SignIn extends Component {
 
               >{success}</div>
             }
-              {error && 
+              {/* {error && 
               
-              <div style={{
-                  color: 'red',
-                  backgroundColor: '#ffe6e6', 
+              <div style={{ color: 'red', backgroundColor: '#ffe6e6', 
                   border: '1px solid red',
                   padding: '10px',
                   borderRadius: '5px',
                   margin: '10px 0'
               }}  >
                 {Object.keys(error).length > 0 ? (
-                  <div>
-                  {Object.keys(error).map((key) => (
-                      <span key={key}>
+                <div >
+                  {Object.keys(error).map((key,_) => (
+                      <span key={_}>
                           {error[key].map((msg, index) => (
                             <>
                               <span key={index}>{msg}</span><br />
@@ -135,7 +136,7 @@ export default class SignIn extends Component {
               </div>
                 ): ''}
               </div>
-            }
+            } */}
 
               <Form
                 onFinish={this.onFinish}
@@ -185,24 +186,24 @@ export default class SignIn extends Component {
         </Content>
         <Footer>
           <Menu mode="horizontal">
-            <Menu.Item>Company</Menu.Item>
-            <Menu.Item>About Us</ Menu.Item>
-            <Menu.Item>Teams</Menu.Item>
-            <Menu.Item>Products</Menu.Item>
-            <Menu.Item>Blogs</Menu.Item>
-            <Menu.Item>Pricing</Menu.Item>
+            <Menu.Item key="1">Company</Menu.Item>
+            <Menu.Item key="2">About Us</ Menu.Item>
+            <Menu.Item key="3">Teams</Menu.Item>
+            <Menu.Item key="4">Products</Menu.Item>
+            <Menu.Item key="5">Blogs</Menu.Item>
+            <Menu.Item key="6">Pricing</Menu.Item>
           </Menu>
           <Menu mode="horizontal" className="menu-nav-social">
-            <Menu.Item>
+            <Menu.Item key="1">
               <Link to="#">{<DribbbleOutlined />}</Link>
             </Menu.Item>
-            <Menu.Item>
+            <Menu.Item key="2">
               <Link to="#">{<TwitterOutlined />}</Link>
             </Menu.Item>
-            <Menu.Item>
+            <Menu.Item key="3">
               <Link to="#">{<InstagramOutlined />}</Link>
             </Menu.Item>
-            <Menu.Item>
+            <Menu.Item key="4">
               <Link to="#">
                 <svg
                   width="18"
@@ -214,7 +215,7 @@ export default class SignIn extends Component {
                 </svg>
               </Link>
             </Menu.Item>
-            <Menu.Item>
+            <Menu.Item key="5">
               <Link to="#">{<GithubOutlined />}</Link>
             </Menu.Item>
           </Menu>

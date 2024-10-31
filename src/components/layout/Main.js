@@ -46,7 +46,7 @@ function Main({ children }) {
     const showLoginToast = localStorage.getItem("showLoginToast");
     if (showLoginToast) {
       message.success("Successfully logged in!"); // Display success toast
-      localStorage.removeItem("showLoginToast"); // Remove flag after showing toast
+      return localStorage.removeItem("showLoginToast"); // Remove flag after showing toast
     }
   }, []);
 
@@ -61,7 +61,7 @@ function Main({ children }) {
         placement={placement === "right" ? "left" : "right"}
         closable={false}
         onClose={() => setVisible(false)}
-        visible={visible}
+        open={visible}
         key={placement === "right" ? "left" : "right"}
         width={250}
         className={`drawer-sidebar ${
@@ -90,7 +90,7 @@ function Main({ children }) {
         breakpoint="lg"
         collapsedWidth="0"
         onCollapse={(collapsed, type) => {
-          console.log(collapsed, type);
+          // console.log(collapsed, type);
         }}
         trigger={null}
         width={250}

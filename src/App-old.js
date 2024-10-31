@@ -1,5 +1,5 @@
 
-import {BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
+import {BrowserRouter as Router, Switch, Route, Redirect , useHistory} from "react-router-dom";
 import Home from "./pages/Home";
 import Tables from "./pages/Tables";
 import Billing from "./pages/Billing";
@@ -18,8 +18,10 @@ import Products from "./pages/products";
 import SalesList from "./pages/sales";
 import Inventory from "./pages/inventory";
 import Reports from "./pages/reports";
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
 import {AuthProvider} from './components/auth/auth.js'
+import PrivateRoute from './components/auth/PrivateRoute.js'
+import NotFound from './components/notfound/NotFound.js'
 
 
 /**
@@ -27,6 +29,7 @@ import {AuthProvider} from './components/auth/auth.js'
  */
 function App() {
   const [isAuth, setAuth] = useState(false);
+
 
   const getItemAsync = (key) => {
       return new Promise((resolve) => {
@@ -48,40 +51,42 @@ function App() {
   return (
     <AuthProvider >
     <div className="App">
-      <Router >
+    <Router>
       <Switch>
-
         <Route 
           path="/sign-in" 
           exact 
-          render={() => {
-            return isAuth ? <Redirect to="/dashboard" /> : <SignIn />
-          }}/>
-        <Route path="/sign-up" exact component={SignUp} />
+          render={() => (isAuth ? <Redirect to="/dashboard" /> : <SignIn setAuth={setAuth}/>)}
+        />
+        <Route 
+          path="/sign-up" 
+          exact 
+          render={() => (isAuth ? <Redirect to="/dashboard" /> : <SignUp setAuth={setAuth}/>)}
+        />
 
-        <Main> 
+        {isAuth ? (
+          <Main>
+            <Switch>
+              <Route exact path="/dashboard" component={Home} />
+              <Route exact path="/category" component={Category} />
+              <Route exact path="/brands" component={Brand} />
+              <Route exact path="/attributes" component={Attributtes} />
+              <Route exact path="/products" component={Products} />
+              <Route exact path="/sales" component={SalesList} />
+              <Route exact path="/inventory" component={Inventory} />
+              <Route exact path="/reports" component={Reports} />
+            </Switch>
+          </Main>
+        ) : (
+          <Redirect to="/sign-in" />
+        )}
 
-          <Route 
-            exact 
-            path="/dashboard"  
-            render={() => {
-              return isAuth ? <Home />  : <Redirect to="/sign-in" />
-            }}
-          />
-          <Route exact path="/category" component={Category} />
-          <Route exact path="/brands" component={Brand} />
-          <Route exact path="/attributes" component={Attributtes} />
-          <Route exact path="/products" component={Products} />
-          <Route path="/sales" exact component={SalesList} />
-          <Route path="/inventory" exact component={Inventory} />
-          <Route path="/reports" exact component={Reports} />
+        <Route component={NotFound} />  //Almost to cry why this route is never matched if no url
 
-        </Main>
-        {/* <Route path="*" exact component={SignIn} /> */}
 
       </Switch>
+    </Router>
 
-      </Router>
     </div>
     </AuthProvider>
   );
