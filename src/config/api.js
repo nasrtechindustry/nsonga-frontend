@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { logout } from '../../../utility/ReusableFunctions.jsx';
+// import { logout } from '../../../utility/ReusableFunctions.jsx';
 // import { logout } from '../index.js';
 
 // Create an Axios instance
@@ -106,7 +106,7 @@ export const performGetRequest = (endURL, accessToken = null, params = {}, decod
         })
         .catch((error) => {
             if (error.response && error.response.status === 401) {
-                logout();
+                // logout();
             }
             throw error;
         });
@@ -134,7 +134,7 @@ export const performDeleteRequest = (endURL, accessToken = null) => {
         })
         .catch((error) => {
             if (error.response && error.response.status === 401) {
-                logout();
+                // logout();
             }
             throw error;
         });

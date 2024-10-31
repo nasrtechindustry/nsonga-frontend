@@ -13,7 +13,7 @@ import "./assets/styles/main.css";
 import "./assets/styles/responsive.css";
 import Category from "./pages/category";
 import Brand from "./pages/brand";  
-import Attributtes from "./pages/attributes";
+import Attributtes from "./pages/attributes/attributes";
 import Products from "./pages/products";
 import SalesList from "./pages/sales";
 import Inventory from "./pages/inventory";
