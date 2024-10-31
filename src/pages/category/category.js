@@ -1,9 +1,9 @@
-import { Row, Col, Table, Card, Button, Form, Input, message, Space, Popconfirm, Modal } from "antd";
+import { Row, Col, Table, Card, Button, Form, Input, message, Space, Modal, Radio } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import BgProfile from "../assets/images/bg-profile.jpg";
-import apiClient from "../axios-client";
+import BgProfile from "../../assets/images/bg-profile.jpg";
+import apiClient from "../../axios-client";
 import { useState, useEffect } from "react";
-import Loader from "../components/loader/Loader";
+import Loader from "../../components/loader/Loader";
 
 function Category() {
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -16,6 +16,8 @@ function Category() {
         pageSize: 3,
         total: 0,
     });
+    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState(null);
 
     const columns = [
         {
@@ -38,18 +40,12 @@ function Category() {
                         onClick={() => handleEdit(record)} // Pass the whole record
                         style={{ padding: 2, width: 'auto' }}
                     />
-                    <Popconfirm
-                        title="Are you sure to delete this category?"
-                        onConfirm={() => handleDelete(record.id)} 
-                        okText="Yes"
-                        cancelText="No"
-                    >
-                        <Button
-                            type="text"
-                            icon={<DeleteOutlined style={{ color: 'red' }} />}
-                            style={{ padding: 0, width: 'auto' }}
-                        />
-                    </Popconfirm>
+                    <Button
+                        type="text"
+                        icon={<DeleteOutlined style={{ color: 'red' }} />}
+                        onClick={() => showDeleteModal(record)}
+                        style={{ padding: 0, width: 'auto' }}
+                    />
                 </>
             ),
         },
@@ -71,7 +67,7 @@ function Category() {
             setPagination((prev) => ({
                 ...prev,
                 current,
-                total: response.data.total, // Set the total count from the response
+                total: response.data.total,
             }));
         } catch (error) {
             message.error('Failed to fetch categories');
@@ -93,9 +89,9 @@ function Category() {
         try {
             const response = await apiClient.post('/category', payload);
             if (response.data.success) {
-                fetchCategories(pagination.current); // Refresh categories on the current page
+                fetchCategories(pagination.current);
                 message.success(response.data.message);
-                form.resetFields(); // Reset form fields after submission
+                form.resetFields();
             } else {
                 message.error(response.data.message);
             }
@@ -115,11 +111,11 @@ function Category() {
         try {
             const response = await apiClient.put(`/category/${editingCategory.id}`, payload);
             if (response.data.success) {
-                fetchCategories(pagination.current); // Refresh categories on the current page
+                fetchCategories(pagination.current);
                 message.success(response.data.message);
                 setEditingCategory(null);
-                setIsModalVisible(false); // Close modal after successful update
-                form.resetFields(); // Reset form fields after submission
+                setIsModalVisible(false);
+                form.resetFields();
             } else {
                 message.error(response.data.message);
             }
@@ -130,13 +126,19 @@ function Category() {
         }
     };
 
-    const handleDelete = async (id) => {
+    const showDeleteModal = (category) => {
+        setSelectedCategory(category);
+        setIsDeleteModalVisible(true);
+    };
+
+    const handleDeleteConfirm = async () => {
         try {
             setLoading(true);
-            const response = await apiClient.patch(`/category/${id}/archive`);
+            const response = await apiClient.patch(`/category/${selectedCategory.id}/archive`);
             if (response.data.success) {
                 message.success(response.data.message);
-                fetchCategories(pagination.current); // Refresh categories on the current page
+                fetchCategories(pagination.current);
+                setIsDeleteModalVisible(false);
             } else {
                 message.error(response.data.message);
             }
@@ -149,8 +151,14 @@ function Category() {
 
     const handleEdit = (category) => {
         setEditingCategory(category);
-        form.setFieldsValue({ category_name: category.name }); // Set the form values for editing
-        setIsModalVisible(true); // Open the modal for editing
+        form.setFieldsValue({ category_name: category.name });
+        setIsModalVisible(true);
+    };
+
+    const onFill = () => {
+        form.setFieldsValue({
+            name: 'Destainer',
+        });
     };
 
     return (
@@ -160,10 +168,26 @@ function Category() {
                 style={{ backgroundImage: `url(${BgProfile})` }}
             ></div>
 
-            {isLoading && <Loader />}
+            {/* {isLoading && <Loader />} */}
+
+            <Card
+                className="card-profile-head"
+                bodyStyle={{display: "none"}}
+                title={
+                    <Row justify="space-between" align="middle" gutter={[24, 0]}>
+                        <Col span={24} md={12} className="col-info"></Col>
+                        <Col span={24} md={12} style={{display: "flex", alignItems: "center", justifyContent: "flex-end"}}>
+                            <Radio.Group defaultValue="a">
+                                <Radio.Button value="a">Attributes</Radio.Button>
+                                <Radio.Button value="c">DEPRICATED</Radio.Button>
+                            </Radio.Group>
+                        </Col>
+                    </Row>
+                }
+            ></Card>
 
             <Row gutter={[24, 0]}>
-                <Col span={24} md={16} className="mb-24 ">
+                <Col span={24} md={16} className="mb-24">
                     <Card
                         bordered={false}
                         className="header-solid h-full"
@@ -171,12 +195,14 @@ function Category() {
                     >
                         <Table
                             dataSource={dataSource}
+                            loading={isLoading}
                             columns={columns}
                             className="ant-border-space"
                             pagination={{
                                 current: pagination.current,
                                 pageSize: pagination.pageSize,
                                 total: pagination.total,
+                                showSizeChanger: true,
                                 onChange: (page, pageSize) => {
                                     fetchCategories(page, pageSize);
                                 },
@@ -205,8 +231,11 @@ function Category() {
                             </Form.Item>
                             <Form.Item>
                                 <Space>
-                                    <Button type="primary" htmlType="submit">
+                                    <Button style={{ backgroundColor: '#0E1573', borderColor: '#0E1573', color: '#fff' }} htmlType="submit">
                                         Submit
+                                    </Button>
+                                    <Button htmlType="button" onClick={onFill}>
+                                        Fill
                                     </Button>
                                 </Space>
                             </Form.Item>
@@ -217,7 +246,7 @@ function Category() {
 
             <Modal
                 title="Edit Category"
-                visible={isModalVisible}
+                open={isModalVisible}
                 onCancel={() => setIsModalVisible(false)}
                 footer={null}
             >
@@ -242,13 +271,24 @@ function Category() {
                             <Button onClick={() => {
                                 setIsModalVisible(false);
                                 setEditingCategory(null);
-                                form.resetFields(); // Reset fields when canceling edit
+                                form.resetFields();
                             }} style={{ marginLeft: 8 }}>
                                 Cancel
                             </Button>
                         </Space>
                     </Form.Item>
                 </Form>
+            </Modal>
+
+            <Modal
+                title="Confirm Delete"
+                open={isDeleteModalVisible}
+                onOk={handleDeleteConfirm}
+                onCancel={() => setIsDeleteModalVisible(false)}
+                okText="Delete"
+                okButtonProps={{ danger: true }}
+            >
+                <p>Are you sure you want to delete this category?</p>
             </Modal>
         </>
     );

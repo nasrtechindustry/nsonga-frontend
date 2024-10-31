@@ -45,11 +45,11 @@ const columns = [
 ];
 
 const handleDelete = (key) => {
-    console.log('Delete record with key:', key);
+    // console.log('Delete record with key:', key);
 };
 
 const handleEdit = (key) => {
-    console.log('Edit record with key:', key);
+    // console.log('Edit record with key:', key);
 };
 
 
@@ -69,7 +69,6 @@ function Attributes() {
 
         const values = await form.validateFields();
 
-        console.log('Received values of form: ', values);
     
         const payload = {
             name: values.name,
@@ -85,13 +84,13 @@ function Attributes() {
                 message.error('Failed to create attribute. Please try again.');
             }
         } catch (error) {
-            console.error('Error creating attribute:', error);
+            // console.error('Error creating attribute:', error);
             message.error('Failed to create attribute. Please try again.');
         }
     
     }
 
-    console.log(data);
+    // console.log(data);
 
     // Update attributesData when fetched data changes
     useEffect(() => {

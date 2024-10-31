@@ -66,7 +66,7 @@ apiClient.interceptors.response.use(
 
         }
         
-        return Promise.reject(err); // Reject the promise to handle it in the calling code
+        return Promise.reject(err); 
     }
 );
 

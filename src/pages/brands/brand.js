@@ -1,20 +1,9 @@
 import React, { useEffect, useState } from "react";
-import {
-    Row,
-    Col,
-    Table,
-    Card,
-    Button,
-    Form,
-    Input,
-    message,
-    Space,
-    Modal,
-    Radio,
-} from "antd";
+import { Row, Col, Table, Card, Button, Form, Input, message, Space, Modal, Radio,} from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import axios from "axios";
-import BgProfile from "../assets/images/bg-profile.jpg";
+import apiClient from "../../axios-client";
+import BgProfile from "../../assets/images/bg-profile.jpg";
 
 const Brand = () => {
     const [form] = Form.useForm();
@@ -34,7 +23,7 @@ const Brand = () => {
     const fetchBrands = async (page = 1, pageSize = 3) => {
         setLoading(true);
         try {
-            const response = await axios.get("http://localhost:8000/api/brands", {
+            const response = await apiClient.get("http://localhost:8000/api/brands", {
                 params: { page, pageSize },
             });
             setDataSource(response.data); // Adjust based on your API response structure
@@ -58,7 +47,7 @@ const Brand = () => {
     const onFinish = async (values) => {
         setActionLoading(true);
         try {
-            const response = await axios.post("http://localhost:8000/api/brands", values);
+            const response = await apiClient.post("http://localhost:8000/api/brands", values);
             message.success("Brand added successfully!");
             setDataSource([...dataSource, response.data]); // Add the new brand to the state
             form.resetFields(); // Reset form fields
@@ -92,7 +81,7 @@ const Brand = () => {
     const handleEditConfirm = async () => {
         try {
             const updatedBrand = form.getFieldValue("name");
-            await axios.put(`http://localhost:8000/api/brands/${selectedBrand.id}`, {
+            await apiClient.put(`http://localhost:8000/api/brands/${selectedBrand.id}`, {
                 name: updatedBrand,
             });
             message.success("Brand updated successfully!");
@@ -115,7 +104,7 @@ const Brand = () => {
     const handleDeleteConfirm = async () => {
         setActionLoading(true);
         try {
-            await axios.delete(`http://localhost:8000/api/brands/${selectedBrand.id}`);
+            await apiClient.delete(`http://localhost:8000/api/brands/${selectedBrand.id}`);
             message.success("Brand deleted successfully!");
             setDataSource((prevData) =>
                 prevData.filter((item) => item.id !== selectedBrand.id)
@@ -155,7 +144,6 @@ const Brand = () => {
                         icon={<DeleteOutlined style={{ color: "red" }} />}
                         onClick={() => handleDelete(record)}
                         style={{ padding: 2 }}
-                        loading={actionLoading}
                     />
                 </Space>
             ),

@@ -10,7 +10,7 @@ export const axiosInstance = axios.create({
 
 // Function to retrieve the stored token
 export function getToken() {
-    return localStorage.getItem('accessToken') || '';
+    return localStorage.getItem('nsonga-auth-token') || '';
 }
 
 
@@ -23,7 +23,7 @@ export const performLoginRequest = async (payload) => {
             const token = response.data.token;
 
             // Store token in local storage
-            localStorage.setItem('accessToken', token);
+            localStorage.setItem('nsonga-auth-token', token);
 
             return response.data;
         } else {
@@ -40,7 +40,7 @@ export const performAploadPostRequest = (endURL, payload, accessToken = null) =>
 
     const config = {
         headers: {
-            'multipaty': 'multipart/form-data',
+            'multipart': 'multipart/form-data',
             ...(token && { Authorization: `Bearer ${token}` }),
         },
     };
