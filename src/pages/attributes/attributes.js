@@ -44,18 +44,18 @@ const Attribute = () => {
 
     // Handle Add Attribute
     const onFinish = async (values) => {
-        setLoading(true);
+        setActionLoading(true);
         try {
             const response = await apiClient.post("http://localhost:8000/api/attributes", values);
             message.success("Attribute added successfully!");
             setDataSource([...dataSource, response.data.data]); // Add the new attribute to the state
             form.resetFields(); // Reset form fields
-            fetchAttributes(pagination.current, pagination.pageSize); // Refresh attributes
+            fetchAttributes(pagination.current, pagination.pageSize);
         } catch (error) {
             message.error("Failed to add attribute");
             message.warn("The attribute name exists, it should be unique!");
         } finally {
-            setLoading(false);
+            setActionLoading(false);
         }
     };
 
@@ -121,7 +121,7 @@ const Attribute = () => {
         } catch (error) {
             message.error("Failed to delete attribute");
         } finally {
-            setActionLoading(false);
+            setLoading(false);
         }
     };
 
@@ -129,7 +129,7 @@ const Attribute = () => {
         {
             title: "SN",
             dataIndex: "id",
-            key: "id",
+            render: (_, __, index) => index < 9 ? `0${(pagination.current - 1) * pagination.pageSize + index + 1}`:(pagination.current - 1) * pagination.pageSize + index + 1,
         },
         {
             title: "Name",
@@ -251,10 +251,10 @@ const Attribute = () => {
                             </Form.Item>
                             <Form.Item>
                                 <Space>
-                                    <Button style={{ backgroundColor: '#0E1573', borderColor: '#0E1573', color: '#fff' }} htmlType="submit">
+                                    <Button style={{ backgroundColor: '#0E1573', borderColor: '#0E1573', color: '#fff' }} htmlType="submit" loading={actionLoading}>
                                         Submit
                                     </Button>
-                                    <Button htmlType="button" onClick={onFill}>
+                                    <Button htmlType="button" onClick={onFill} >
                                         Fill
                                     </Button>
                                 </Space>

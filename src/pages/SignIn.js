@@ -54,10 +54,6 @@ export default class SignIn extends Component {
           const errorDics = response.data.data[0]
           for (let i in errorDics){
             let error  =  errorDics[i]
-            // notification.error({
-            //   description: error ,
-            //   placement: 'topRight',
-            // });
             message.error(error)
             
           }
@@ -88,7 +84,7 @@ export default class SignIn extends Component {
 
     return (
       <Layout className="layout-default layout-signin">
-        {isLoading && <Loader />}
+        {/* {isLoading && <Loader />} */}
         <Header>
           <div className="header-col header-brand">
             <h5>Nsonga Sales | Inventory</h5>
@@ -169,7 +165,7 @@ export default class SignIn extends Component {
                 </Form.Item>
 
                 <Form.Item>
-                  <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
+                  <Button type="primary" htmlType="submit" style={{ width: "100%" }} loading={isLoading}>
                     SIGN IN
                   </Button>
                 </Form.Item>

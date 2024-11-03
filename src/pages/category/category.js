@@ -8,7 +8,7 @@ const Categories = () => {
     const [form] = Form.useForm();
     const [dataSource, setDataSource] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [actionLoading, setActionLoading] = useState(false);
+    const [btnLoading, setBtnLoading] = useState(false);
     const [pagination, setPagination] = useState({
         current: 1,
         pageSize: 3,
@@ -44,7 +44,7 @@ const Categories = () => {
 
     // Handle Add Category
     const onFinish = async (values) => {
-        setLoading(true);
+        setBtnLoading(true);
 
         try {
             const response = await apiClient.post("http://localhost:8000/api/category", values);
@@ -55,12 +55,12 @@ const Categories = () => {
         } catch (error) {
             message.error("Failed to add category");
         } finally {
-            setLoading(true);
+            setBtnLoading(false);
         }
     };
 
     // Fill form with default values
-    const onFill = () => {
+   const onFill = () => {
         form.setFieldsValue({
             name: 'Sample Category', // Default value for filling
         });
@@ -90,8 +90,8 @@ const Categories = () => {
 
     // Confirm Edit
     const handleEditConfirm = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
             const updatedCategory = form.getFieldValue("name");
             await apiClient.put(`http://localhost:8000/api/category/${selectedCategory.id}`, {
                 name: updatedCategory,
@@ -108,8 +108,7 @@ const Categories = () => {
             setIsEditModalOpen(false);
         } catch (error) {
             message.error("Failed to update category");
-        }
-        finally{
+        }finally{
             setLoading(false);
         }
     };
@@ -141,7 +140,8 @@ const Categories = () => {
         {
             title: "SN",
             dataIndex: "id",
-            key: "id",
+            render: (_, __, index) => index < 9 ? `0${(pagination.current - 1) * pagination.pageSize + index + 1}`:(pagination.current - 1) * pagination.pageSize + index + 1,
+
         },
         {
             title: "Name",
@@ -251,7 +251,8 @@ const Categories = () => {
                             </Form.Item>
                             <Form.Item>
                                 <Space>
-                                    <Button style={{ backgroundColor: '#0E1573', borderColor: '#0E1573', color: '#fff' }} htmlType="submit">
+                                    <Button style={{ backgroundColor: '#0E1573', borderColor: '#0E1573', color: '#fff' }} htmlType="submit"
+                                    loading={btnLoading}>
                                         Submit
                                     </Button>
                                     <Button htmlType="button" onClick={onFill}>
@@ -270,6 +271,7 @@ const Categories = () => {
                 open={isEditModalOpen}
                 onOk={handleEditConfirm}
                 onCancel={() => setIsEditModalOpen(false)}
+            
             >
                 <Form form={form} layout="vertical">
                     <Form.Item

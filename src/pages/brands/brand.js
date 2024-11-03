@@ -8,6 +8,7 @@ const Brand = () => {
     const [form] = Form.useForm();
     const [dataSource, setDataSource] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [btnloading , setBtnLoading] = useState(false);
     const [pagination, setPagination] = useState({
         current: 1,
         pageSize: 3,
@@ -43,7 +44,7 @@ const Brand = () => {
 
     // Handle Add Brand
     const onFinish = async (values) => {
-        setLoading(true);
+        setBtnLoading(true);
         try {
             const response = await apiClient.post("http://localhost:8000/api/brands", values);
             message.success("Brand added successfully!");
@@ -53,7 +54,7 @@ const Brand = () => {
         } catch (error) {
             message.warn("The brand name exists, it should be unique!");
         } finally {
-            setLoading(false);
+            setBtnLoading(false);
         }
     };
 
@@ -121,7 +122,7 @@ const Brand = () => {
         {
             title: "SN",
             dataIndex: "id",
-            key: "id",
+            render: (_, __, index) => index < 9 ? `0${(pagination.current - 1) * pagination.pageSize + index + 1}`:(pagination.current - 1) * pagination.pageSize + index + 1,
         },
         {
             title: "Name",
@@ -231,7 +232,11 @@ const Brand = () => {
                             </Form.Item>
                             <Form.Item>
                                 <Space>
-                                    <Button style={{ backgroundColor: '#0E1573', borderColor: '#0E1573', color: '#fff' }} htmlType="submit">
+                                    <Button 
+                                        style={{ backgroundColor: '#0E1573', borderColor: '#0E1573', color: '#fff' }} 
+                                        htmlType="submit"
+                                        loading={btnloading}
+                                    >
                                         Submit
                                     </Button>
                                     <Button htmlType="button" onClick={onFill}>

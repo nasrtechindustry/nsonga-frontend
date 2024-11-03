@@ -10,30 +10,13 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 import React, { Component } from "react";
-import {
-  Layout,
-  Menu,
-  Button,
-  Typography,
-  Card,
-  Form,
-  Input,
-  Checkbox, notification,
-  message
-} from "antd";
+import { Layout, Menu, Button, Typography, Card, Form, Input, Checkbox, notification, message} from "antd";
 import logo1 from "../assets/images/logos-facebook.svg";
 import logo2 from "../assets/images/logo-apple.svg";
 import logo3 from "../assets/images/Google__G__Logo.svg.png";
-
 import { Link } from "react-router-dom";
-import {
-  DribbbleOutlined,
-  TwitterOutlined,
-  InstagramOutlined,
-  GithubOutlined,
-} from "@ant-design/icons";
+import { DribbbleOutlined, TwitterOutlined, InstagramOutlined, GithubOutlined,} from "@ant-design/icons";
 import apiClient from "../axios-client";
-import axios from 'axios';
 import Loader from '../components/loader/Loader';
 
 const { Title } = Typography;
@@ -118,86 +101,82 @@ const signin = [
     />
   </svg>,
 ];
+
+/**
+ * @returns Sign up component
+ */
 export default class SignUp extends Component {
   constructor(props){
-    super(props)
-    this.state = {
-      name: '',
-      emaill: '',
-      password: '',
-      passwordConfirmation: '',
-      isLoading: false
+    super(props);
+    //initializing all the state variables
+        this.state = {
+          name: '',
+          emaill: '',
+          password: '',
+          passwordConfirmation: '',
+          isLoading: false,
+          timer: null
+        };
+      }
+
+  
+  onFinish = (values) => {
+    this.setState({isLoading:true})
+
+    const payload = {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        passwordConfirmation : values.passwordConfirmation,
+        remember: values.remember,
     };
-  }
-  render() {
 
-    const { success, error } = this.state;
+    // Send the payload to the API
+    apiClient.post('/register', payload)
+        .then(response => {
+            if(response.data.success){
+              this.setState({ 
+                name: '',
+                password: '',
+                passwordConfirmation: '',
+                email: '',
+                isLoading: false,
+              });
+            message.success(response.data.message)
+              
+            localStorage.setItem('nsonga-auth-token', response.data.data.user.token);
+            localStorage.setItem('showLoginToast', 'true');
 
-    const onFinish = (values) => {
-      this.setState({isLoading:true})
+            this.state.timer = setTimeout(()=>{
+              this.props.setAuth(true);
+            },3000) ;
+            
+            }else{
+              this.setState({ success: null, error: response.data.data[0] ,isLoading:false}); 
 
-      const payload = {
-          name: values.name,
-          email: values.email,
-          password: values.password,
-          passwordConfirmation : values.passwordConfirmation,
-          remember: values.remember,
-      };
+              const errorDics = response.data.data[0]
 
-      // Send the payload to the API
-      apiClient.post('/register', payload)
-          .then(response => {
-              if(response.data.success){
-                this.setState({ 
-                  name: '',
-                  password: '',
-                  passwordConfirmation: '',
-                  email: '',
-                  isLoading: false
-                });
-              //   notification.success({
-              //       description: response.data.message,
-              //       placement: 'topRight',
-              //       duration: 3,
-              //  });
-              message.success(response.data.message)
-                
-              localStorage.setItem('nsonga-auth-token', response.data.data.user.token);
-              localStorage.setItem('showLoginToast', 'true');
-
-              setTimeout(()=>{
-                this.props.setAuth(true);
-              },3000)  
-
-    
-              }else{
-                this.setState({ success: null, error: response.data.data[0] ,isLoading:false}); 
-
-                const errorDics = response.data.data[0]
-
-                for (let i in errorDics){
-
-                  // notification.warn({
-                  //   description: errorDics[i],
-                  //   placement: 'topRight',
-                  //   duration: 10,
-                  // });
-                  message.error(errorDics[i] , 10)
-                }
+              for (let i in errorDics){
+                message.error(errorDics[i])
               }
-          })
-          .catch(err => {
-              console.error('Error:', err);
-          });
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err.message);
+        });
   };
     
-    const onFinishFailed = (errorInfo) => {
+
+  componentWillUnmount(){
+    clearTimeout(this.state.timer);
+  }
+    onFinishFailed = (errorInfo) => {
       message.error('All fields are required')
     };
+  render() {
     return (
       <>
         <div className="layout-default ant-layout layout-sign-up">
-          {this.state.isLoading && <Loader />}
           <Header>
             <div className="header-col header-brand">
               <h5>Nsonga Sales | Inventory</h5>
@@ -231,9 +210,9 @@ export default class SignUp extends Component {
               <Form
                 name="basic"
                 initialValues={{ remember: true }}
-                onFinish={onFinish}
-                onFinishFailed={onFinishFailed}
-                className="row-col"
+                onFinish={this.onFinish}
+                onFinishFailed={this.onFinishFailed}
+                className="row-col" 
               >
                 <Form.Item
                   name="name"
@@ -283,6 +262,7 @@ export default class SignUp extends Component {
                     style={{ width: "100%" }}
                     type="primary"
                     htmlType="submit"
+                    loading={this.state.isLoading}
                   >
                     SIGN UP
                   </Button>
