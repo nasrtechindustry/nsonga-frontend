@@ -66,6 +66,7 @@ function App() {
             {isAuth ? (
               <Main>
                 <Switch>
+                  <Route exact path="/" render={() => (<Redirect to="/dashboard" />)}/>
                   <Route exact path="/dashboard" component={Home} />
                   <Route exact path="/category" component={Category} />
                   <Route exact path="/brands" component={Brand} />
@@ -74,6 +75,7 @@ function App() {
                   <Route exact path="/sales" component={SalesList} />
                   <Route exact path="/inventory" component={Inventory} />
                   <Route exact path="/reports" component={Reports} />
+                  <Route exact path="/profile" component={Profile} />
                 </Switch>
               </Main>
             ) : (

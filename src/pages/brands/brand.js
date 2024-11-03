@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Table, Card, Button, Form, Input, message, Space, Modal, Radio,} from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import axios from "axios";
 import apiClient from "../../axios-client";
 import BgProfile from "../../assets/images/bg-profile.jpg";
 
@@ -9,7 +8,6 @@ const Brand = () => {
     const [form] = Form.useForm();
     const [dataSource, setDataSource] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [actionLoading, setActionLoading] = useState(false);
     const [pagination, setPagination] = useState({
         current: 1,
         pageSize: 3,
@@ -45,7 +43,7 @@ const Brand = () => {
 
     // Handle Add Brand
     const onFinish = async (values) => {
-        setActionLoading(true);
+        setLoading(true);
         try {
             const response = await apiClient.post("http://localhost:8000/api/brands", values);
             message.success("Brand added successfully!");
@@ -53,10 +51,9 @@ const Brand = () => {
             form.resetFields(); // Reset form fields
             fetchBrands(pagination.current, pagination.pageSize); // Refresh brands
         } catch (error) {
-            message.error("Failed to add brand");
             message.warn("The brand name exists, it should be unique!");
         } finally {
-            setActionLoading(false);
+            setLoading(false);
         }
     };
 
@@ -80,6 +77,7 @@ const Brand = () => {
     // Confirm Edit
     const handleEditConfirm = async () => {
         try {
+            setLoading(true)
             const updatedBrand = form.getFieldValue("name");
             await apiClient.put(`http://localhost:8000/api/brands/${selectedBrand.id}`, {
                 name: updatedBrand,
@@ -91,6 +89,8 @@ const Brand = () => {
             setIsEditModalOpen(false);
         } catch (error) {
             message.error("Failed to update brand");
+        }finally{
+            setLoading(false)
         }
     };
 
@@ -102,7 +102,7 @@ const Brand = () => {
 
     // Confirm Delete
     const handleDeleteConfirm = async () => {
-        setActionLoading(true);
+        setLoading(true);
         try {
             await apiClient.delete(`http://localhost:8000/api/brands/${selectedBrand.id}`);
             message.success("Brand deleted successfully!");
@@ -113,7 +113,7 @@ const Brand = () => {
         } catch (error) {
             message.error("Failed to delete brand");
         } finally {
-            setActionLoading(false);
+            setLoading(false);
         }
     };
 

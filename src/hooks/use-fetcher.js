@@ -44,5 +44,5 @@ export  function useFetch(url, options = {}) {
         }
     }, [url, autoRefresh, fetchData]);
 
-    return { data, loading, error, refetch: fetchData };
+    return { data, loading, error, refetch: fetchData }; 
 }

@@ -1,8 +1,5 @@
 import axios from 'axios';
 
-// import { logout } from '../../../utility/ReusableFunctions.jsx';
-// import { logout } from '../index.js';
-
 // Create an Axios instance
 export const axiosInstance = axios.create({
     baseURL: 'http://127.0.0.1:8000/api'
@@ -38,9 +35,12 @@ export const performLoginRequest = async (payload) => {
 export const performAploadPostRequest = (endURL, payload, accessToken = null) => {
     const token = accessToken || getToken();
 
+    // Determine if payload contains a file
+    const hasFile = payload instanceof FormData;
+
     const config = {
         headers: {
-            'multipart': 'multipart/form-data',
+            'Content-Type': hasFile ? 'multipart/form-data' : 'application/json',
             ...(token && { Authorization: `Bearer ${token}` }),
         },
     };
@@ -49,6 +49,7 @@ export const performAploadPostRequest = (endURL, payload, accessToken = null) =>
         return response.data;
     });
 };
+
 
 
 

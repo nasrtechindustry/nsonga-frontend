@@ -1,76 +1,38 @@
-import { Row, Col, Table, Card, Button, Form, Input, message, Space, Modal, Radio } from "antd";
+import React, { useEffect, useState } from "react";
+import { Row, Col, Table, Card, Button, Form, Input, message, Space, Modal ,Radio} from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import apiClient from "../../axios-client"; // Assuming you are using the same API client
 import BgProfile from "../../assets/images/bg-profile.jpg";
-import apiClient from "../../axios-client";
-import { useState, useEffect } from "react";
-import Loader from "../../components/loader/Loader";
 
-function Category() {
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [editingCategory, setEditingCategory] = useState(null);
-    const [dataSource, setDataSource] = useState([]);
-    const [isLoading, setLoading] = useState(false);
+const Categories = () => {
     const [form] = Form.useForm();
+    const [dataSource, setDataSource] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState(false);
     const [pagination, setPagination] = useState({
         current: 1,
         pageSize: 3,
-        total: 0,
     });
-    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
 
-    const columns = [
-        {
-            title: 'SN',
-            render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1,
-        },
-        {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
-        },
-        {
-            title: "Actions",
-            key: "actions",
-            render: (_, record) => (
-                <>
-                    <Button
-                        type="text"
-                        icon={<EditOutlined style={{ color: 'orange' }} />}
-                        onClick={() => handleEdit(record)} // Pass the whole record
-                        style={{ padding: 2, width: 'auto' }}
-                    />
-                    <Button
-                        type="text"
-                        icon={<DeleteOutlined style={{ color: 'red' }} />}
-                        onClick={() => showDeleteModal(record)}
-                        style={{ padding: 0, width: 'auto' }}
-                    />
-                </>
-            ),
-        },
-    ];
-
-    const fetchCategories = async (current = 1, pageSize = pagination.pageSize) => {
+    // Fetch categories from the API
+    const fetchCategories = async (page = 1, pageSize = 3) => {
+        setLoading(true);
         try {
-            setLoading(true);
-            const response = await apiClient.get('/category', {
-                params: { page: current, pageSize },
+            const response = await apiClient.get("http://localhost:8000/api/category", {
+                params: { page, pageSize },
             });
-            const data = response.data.data.map((category) => ({
-                key: category.id,
-                id: category.id, 
-                name: category.name,
-            }));
-
-            setDataSource(data);
-            setPagination((prev) => ({
-                ...prev,
-                current,
-                total: response.data.total,
-            }));
+            setDataSource(response.data.data); // Adjust based on your API response structure
+            setPagination({
+                current: page,
+                pageSize: pageSize,
+                total: response.data.total, // Total number of categories from the API response
+            });
         } catch (error) {
-            message.error('Failed to fetch categories');
+            message.error("Failed to fetch categories");
         } finally {
             setLoading(false);
         }
@@ -80,103 +42,157 @@ function Category() {
         fetchCategories();
     }, []);
 
-    const handleAddCategory = async (values) => {
-        const payload = {
-            name: values.category_name,
-        };
-
+    // Handle Add Category
+    const onFinish = async (values) => {
         setLoading(true);
+
         try {
-            const response = await apiClient.post('/category', payload);
-            if (response.data.success) {
-                fetchCategories(pagination.current);
-                message.success(response.data.message);
-                form.resetFields();
-            } else {
-                message.error(response.data.message);
-            }
-        } catch (err) {
-            message.error('Failed to add category: ' + (err.response?.data.message || 'Category name must be unique'));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleEditCategory = async (values) => {
-        const payload = {
-            name: values.category_name,
-        };
-
-        setLoading(true);
-        try {
-            const response = await apiClient.put(`/category/${editingCategory.id}`, payload);
-            if (response.data.success) {
-                fetchCategories(pagination.current);
-                message.success(response.data.message);
-                setEditingCategory(null);
-                setIsModalVisible(false);
-                form.resetFields();
-            } else {
-                message.error(response.data.message);
-            }
-        } catch (err) {
-            message.error('Failed to update category: ' + (err.response?.data.message || 'Category name must be unique'));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const showDeleteModal = (category) => {
-        setSelectedCategory(category);
-        setIsDeleteModalVisible(true);
-    };
-
-    const handleDeleteConfirm = async () => {
-        try {
-            setLoading(true);
-            const response = await apiClient.patch(`/category/${selectedCategory.id}/archive`);
-            if (response.data.success) {
-                message.success(response.data.message);
-                fetchCategories(pagination.current);
-                setIsDeleteModalVisible(false);
-            } else {
-                message.error(response.data.message);
-            }
+            const response = await apiClient.post("http://localhost:8000/api/category", values);
+            message.success("Category added successfully!");
+            setDataSource([...dataSource, response.data.data]); // Add the new category to the state
+            form.resetFields(); // Reset form fields
+            fetchCategories(pagination.current, pagination.pageSize); // Refresh categories
         } catch (error) {
-            message.error('Server Error: Unable to delete the category');
+            message.error("Failed to add category");
         } finally {
-            setLoading(false);
+            setLoading(true);
         }
     };
 
-    const handleEdit = (category) => {
-        setEditingCategory(category);
-        form.setFieldsValue({ category_name: category.name });
-        setIsModalVisible(true);
-    };
-
+    // Fill form with default values
     const onFill = () => {
         form.setFieldsValue({
-            name: 'Destainer',
+            name: 'Sample Category', // Default value for filling
         });
     };
+
+    // Handle Edit button click
+    const handleEdit = (category) => {
+        try{
+            setLoading(true)
+           setSelectedCategory(category);
+            setIsEditModalOpen(true);
+        form.setFieldsValue({ 
+            name: category.name,
+        }); 
+        }catch(e){
+            console.error(e)
+        }
+        finally{
+            setLoading(false);
+        }
+        
+    };
+
+    const handleTableChange = (pagination) => {
+        fetchCategories(pagination.current, pagination.pageSize);
+    };
+
+    // Confirm Edit
+    const handleEditConfirm = async () => {
+        try {
+            setLoading(true);
+            const updatedCategory = form.getFieldValue("name");
+            await apiClient.put(`http://localhost:8000/api/category/${selectedCategory.id}`, {
+                name: updatedCategory,
+            }).then(response => {
+                if(response.data.success){
+                   return message.success("Category updated successfully!");
+                }else{
+                    return message.error('category not updated')
+                }
+            })
+            setDataSource((prevData) =>
+                prevData.map((item) => (item.id === selectedCategory.id ? { ...item, name: updatedCategory } : item))
+            );
+            setIsEditModalOpen(false);
+        } catch (error) {
+            message.error("Failed to update category");
+        }
+        finally{
+            setLoading(false);
+        }
+    };
+
+    // Handle Delete button click
+    const handleDelete = (category) => {
+        setSelectedCategory(category);
+        setIsDeleteModalOpen(true);
+    };
+
+    // Confirm Delete
+    const handleDeleteConfirm = async () => {
+        setLoading(true);
+        try {
+            await apiClient.delete(`http://localhost:8000/api/category/${selectedCategory.id}`);
+            message.success("Category deleted successfully!");
+            setDataSource((prevData) =>
+                prevData.filter((item) => item.id !== selectedCategory.id)
+            );
+            setIsDeleteModalOpen(false);
+        } catch (error) {
+            message.error("Failed to delete category");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const columns = [
+        {
+            title: "SN",
+            dataIndex: "id",
+            key: "id",
+        },
+        {
+            title: "Name",
+            dataIndex: "name",
+            key: "name",
+        },
+        {
+            title: "Actions",
+            key: "actions",
+            render: (_, record) => (
+                <Space size="middle">
+                    <Button
+                        type="text"
+                        icon={<EditOutlined style={{ color: "orange" }} />}
+                        onClick={() => handleEdit(record)}
+                        style={{ padding: 2 }}
+                    />
+                    <Button
+                        type="text"
+                        icon={<DeleteOutlined style={{ color: "red" }} />}
+                        onClick={() => handleDelete(record)}
+                        style={{ padding: 2 }}
+                    />
+                </Space>
+            ),
+        },
+    ];
 
     return (
         <>
             <div
                 className="profile-nav-bg"
-                style={{ backgroundImage: `url(${BgProfile})` }}
+                style={{ backgroundImage: "url(" + BgProfile + ")" }}
             ></div>
-
-            {/* {isLoading && <Loader />} */}
 
             <Card
                 className="card-profile-head"
-                bodyStyle={{display: "none"}}
+                bodyStyle={{ display: "none" }}
                 title={
                     <Row justify="space-between" align="middle" gutter={[24, 0]}>
-                        <Col span={24} md={12} className="col-info"></Col>
-                        <Col span={24} md={12} style={{display: "flex", alignItems: "center", justifyContent: "flex-end"}}>
+                        <Col span={24} md={12} className="col-info">
+                        </Col>
+                        <Col
+                            span={24}
+                            md={12}
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "flex-end",
+                            }}
+                        >
                             <Radio.Group defaultValue="a">
                                 <Radio.Button value="a">Attributes</Radio.Button>
                                 <Radio.Button value="c">DEPRICATED</Radio.Button>
@@ -195,9 +211,9 @@ function Category() {
                     >
                         <Table
                             dataSource={dataSource}
-                            loading={isLoading}
                             columns={columns}
-                            className="ant-border-space"
+                            loading={loading}
+                            rowKey="id"
                             pagination={{
                                 current: pagination.current,
                                 pageSize: pagination.pageSize,
@@ -207,6 +223,8 @@ function Category() {
                                     fetchCategories(page, pageSize);
                                 },
                             }}
+                            onChange={handleTableChange}
+                            className="ant-border-space"
                         />
                     </Card>
                 </Col>
@@ -214,20 +232,22 @@ function Category() {
                 <Col span={24} md={8} className="mb-24">
                     <Card
                         bordered={false}
-                        title={<h6 className="font-semibold m-0">Add Category</h6>}
+                        title={<h6 className="font-semibold m-0">Add New Category</h6>}
                         className="header-solid h-full card-profile-information"
+                        bodyStyle={{ paddingTop: 0, paddingBottom: 16 }}
                     >
                         <Form
                             form={form}
                             layout="vertical"
-                            onFinish={handleAddCategory}
+                            onFinish={onFinish}
+                            autoComplete="on"
                         >
                             <Form.Item
-                                name="category_name"
-                                label="Category Name"
-                                rules={[{ required: true, message: 'Please input the category name!' }]}
+                                name="name"
+                                label="Name"
+                                rules={[{ required: true, message: "Please enter the category name!" }]}
                             >
-                                <Input placeholder="Enter Category name" />
+                                <Input placeholder="Enter category name" />
                             </Form.Item>
                             <Form.Item>
                                 <Space>
@@ -244,47 +264,30 @@ function Category() {
                 </Col>
             </Row>
 
+            {/* Edit Modal */}
             <Modal
                 title="Edit Category"
-                open={isModalVisible}
-                onCancel={() => setIsModalVisible(false)}
-                footer={null}
+                open={isEditModalOpen}
+                onOk={handleEditConfirm}
+                onCancel={() => setIsEditModalOpen(false)}
             >
-                <Form
-                    form={form}
-                    layout="vertical"
-                    onFinish={handleEditCategory}
-                    initialValues={editingCategory ? { category_name: editingCategory.name } : {}}
-                >
+                <Form form={form} layout="vertical">
                     <Form.Item
-                        name="category_name"
+                        name="name"
                         label="Category Name"
-                        rules={[{ required: true, message: 'Please input the category name!' }]}
+                        rules={[{ required: true, message: "Please enter the category name!" }]}
                     >
                         <Input />
-                    </Form.Item>
-                    <Form.Item>
-                        <Space>
-                            <Button type="primary" htmlType="submit">
-                                Update
-                            </Button>
-                            <Button onClick={() => {
-                                setIsModalVisible(false);
-                                setEditingCategory(null);
-                                form.resetFields();
-                            }} style={{ marginLeft: 8 }}>
-                                Cancel
-                            </Button>
-                        </Space>
                     </Form.Item>
                 </Form>
             </Modal>
 
+            {/* Delete Confirmation Modal */}
             <Modal
                 title="Confirm Delete"
-                open={isDeleteModalVisible}
+                open={isDeleteModalOpen}
                 onOk={handleDeleteConfirm}
-                onCancel={() => setIsDeleteModalVisible(false)}
+                onCancel={() => setIsDeleteModalOpen(false)}
                 okText="Delete"
                 okButtonProps={{ danger: true }}
             >
@@ -292,6 +295,6 @@ function Category() {
             </Modal>
         </>
     );
-}
+};
 
-export default Category;
+export default Categories;

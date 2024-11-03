@@ -246,8 +246,6 @@ function Header({
      
       localStorage.removeItem('nsonga-auth-token');       
      
-
-     
       auth.logout();
      
 

@@ -1,15 +1,17 @@
 import axios from 'axios';
+import { useAuth } from './components/auth/auth';
 
 /**
  * API connection init...
  */
 const apiClient = axios.create({
-    baseURL: process.env.REACT_APP_API_URL || "http://localhost:8000/api", // Use environment variable in production
+    baseURL: process.env.REACT_APP_API_URL || "http://localhost:8000/api", 
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
     },
 });
+
 
 
 
@@ -39,12 +41,17 @@ apiClient.interceptors.response.use(
     (err) => {
         try {
             const { response } = err;
+            // const auth = useAuth();
+
             if (response) {
                 if (response.status === 401) {
                     // Handle unauthorized access
                     localStorage.removeItem('nsonga-auth-token');
 
                     console.error('Unauthorized');
+
+                    window.location.replace('/sign-in');
+
 
                 } else if (response.status === 403) {
 
@@ -66,7 +73,7 @@ apiClient.interceptors.response.use(
 
         }
         
-        return Promise.reject(err); 
+        // return Promise.reject(err); 
     }
 );
 
