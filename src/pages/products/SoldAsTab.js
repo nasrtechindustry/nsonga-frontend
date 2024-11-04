@@ -1,0 +1,23 @@
+import React from 'react';
+import { Select } from 'antd';
+
+const { Option } = Select;
+
+const solds = [
+    { value: 'carton', label: 'Carton' },
+    { value: 'dozen', label: 'Dozen' },
+    { value: 'pieces', label: 'Pieces' }
+];
+
+export const SoldAs = ({ onSelect }) => (
+    <Select
+        placeholder="-- Select Sold Type --"
+        onChange={onSelect} 
+    >
+        {solds.map((attr) => (
+            <Option key={attr.value} value={attr.value}>
+                {attr.label}
+            </Option>
+        ))}
+    </Select>
+);

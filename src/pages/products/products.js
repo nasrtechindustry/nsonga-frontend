@@ -1,23 +1,12 @@
-import {
-    Row,
-    Col,
-    Card,
-    Radio,
-    Table,
-    message,
-    Button,
-    Avatar,
-    Typography,
-    Modal,
-    Upload,
-    Tabs,
-    Form, Input, Space
-} from "antd";
+import { Row, Col, Card, Radio, Table, message, Button, Avatar, Typography, Modal, Upload, Tabs, Form, Input, Space, Select} from "antd";
 import { DeleteOutlined, EditOutlined, ToTopOutlined } from "@ant-design/icons";
-
-
 import Draggable from 'react-draggable';
 import { useRef, useState } from "react";
+import { SoldAs } from "./SoldAsTab";
+import CategorySelect  from "./CategoryTab";
+import AttribSelect  from "./AttributesTab";
+import BrandSelect from "./BrandTab";
+import apiClient from "../../axios-client";
 
 
 
@@ -32,23 +21,7 @@ const face6 = "https://images.pexels.com/photos/5217911/pexels-photo-5217911.jpe
 
 const { Title } = Typography;
 
-const formProps = {
-    name: "file",
-    action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
-    headers: {
-        authorization: "authorization-text",
-    },
-    onChange(info) {
-        if (info.file.status !== "uploading") {
-            console.log(info.file, info.fileList);
-        }
-        if (info.file.status === "done") {
-            message.success(`${info.file.name} file uploaded successfully`);
-        } else if (info.file.status === "error") {
-            message.error(`${info.file.name} file upload failed.`);
-        }
-    },
-};
+
 // table code start
 
 const columns = [
@@ -472,8 +445,13 @@ const handleEdit = (key) => {
 
 
 function Products() {
-    // const onChange = (e) => console.log(`radio checked:${e.target.value}`);
 
+    const [loading,isLoading] = useState(false);
+    const [description,setDescription] = useState(null);
+    const [brand, setBrand] = useState(null);
+    const [attribute, setAttribute] = useState(null);
+    const [category , setCategory] = useState(null);
+    const [soldValue,setSoldValue] = useState(null);
     const [open, setOpen] = useState(false);
     const [disabled, setDisabled] = useState(true);
     const [bounds, setBounds] = useState({
@@ -512,24 +490,74 @@ function Products() {
 
 
     const [form] = Form.useForm();
-    const onFinish = () => {
-        message.success('Submit success!');
+    const [fileList, setFileList] = useState([]);
+
+    const handleChangePicture = ({ fileList: newFileList }) => {
+        setFileList(newFileList);
+    };
+    const onFinish = async (values) => {
+        const payload = {
+            ...values,
+            description: description,
+            brand_id:brand,
+            attribute_id:attribute,
+            category_id:category,
+            'sold_as': soldValue
+        }
+
+        const formData = new FormData();
+
+        // Append all other product information to FormData
+        for (const key in payload) {
+            formData.append(key, payload[key]);
+        }
+        
+        // Append the single file to FormData
+        if (fileList.length > 0) {
+            formData.append('image', fileList[0].originFileObj);  
+        }
+        
+        // for debugging only
+        // for (const [key, value] of formData.entries()) {
+        //     console.log(key, value); // This will log each key and value in FormData
+        // }
+
+        try{
+            isLoading(true)
+            const response = await apiClient.post('/products',formData ,{
+                headers: {
+                    'Content-Type' : 'multipart/form-data',
+                }
+            });
+            if (response.data.success) {
+                message.success(response.data.message);
+                form.resetFields(); 
+                setFileList([]); 
+            } else {
+                message.error(response.data.message || 'Failed to upload product');
+            }
+
+        }catch(error){
+            console.error(error.message);
+            message.error('An error occurred while uploading the product');
+        }
+        finally{
+            isLoading(false);
+            setDescription(null)
+        }
     };
     const onFinishFailed = () => {
         message.error('Submit failed!');
     };
-    const onFill = () => {
-        form.setFieldsValue({
-            url: 'https://taobao.com/',
-        });
-    };
-
     const { TextArea } = Input;
 
     const [size, setSize] = useState('small');
     const onChange = (e) => {
         setSize(e.target.value);
     };
+    const hanldeDescr = (event) =>{
+        setDescription(event)
+    }
 
     return (
         <>
@@ -563,6 +591,7 @@ function Products() {
                             open={open}
                             onOk={handleOk}
                             onCancel={handleCancel}
+                            footer={null}
                             modalRender={(modal) => (
                                 <Draggable
                                     disabled={disabled}
@@ -581,8 +610,8 @@ function Products() {
                                 onFinishFailed={onFinishFailed}
                                 autoComplete="off"
                             >
-                                <Row gutter={16}>
-                                    <Col span={12}>
+                                <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
+                                    <Col span={6}>
                                         <Form.Item
                                             name="name"
                                             label="Name"
@@ -591,11 +620,7 @@ function Products() {
                                                     required: true,
                                                     message: 'Please enter the product name',
                                                 },
-                                                {
-                                                    type: 'string',
-                                                    min: 6,
-                                                    message: 'Name must be at least 6 characters long',
-                                                },
+                                                
                                             ]}
                                         >
                                             <Input placeholder="Product Name" />
@@ -604,54 +629,98 @@ function Products() {
 
                                     <Col span={6}>
                                         <Form.Item
-                                            name="category"
+                                            name="category_id"
                                             label="Category"
+                                        
+                                        >
+                                            <CategorySelect onSelect={(value)=>setCategory(value)} />
+                                        </Form.Item>
+                                    </Col>
+
+                                    <Col span={6}>
+                                        <Form.Item
+                                            name="brand_id"
+                                            label="Brand"
+                                           
+                                        >
+                                            <BrandSelect onSelect={(value) => setBrand(value)} />
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={6}>
+                                        <Form.Item
+                                            name="attribute_id"
+                                            label="Attribute"
+                                            
+                                        >
+                                            <AttribSelect onSelect={(value) => setAttribute(value)} />
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                                <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
+                                    
+
+                                    <Col span={6}>
+                                        <Form.Item
+                                            name="sold_as"
+                                            label="Sold as"
+                                        >
+                                            <SoldAs onSelect={(value) => setSoldValue(value)}/>
+                                        </Form.Item>
+                                    </Col>
+
+                                    <Col span={6}>
+                                        <Form.Item
+                                            name="price"
+                                            label="Price"
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message: 'Please enter price for the product',
+                                                },
+                                            
+                                            ]}
+                                        >
+                                            <Input placeholder="eg. Tsh 2000" type="number"/>
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={6}>
+                                        <Form.Item
+                                            name="tax"
+                                            label="Tax"
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message: 'Please enter the tax',
+                                                },
+                                            ]}
+                                        >
+                                            <Input placeholder="eg. 500" type="number" />
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={6}>
+                                        <Form.Item
+                                            name="inventory"
+                                            label="Inventory"
                                             rules={[
                                                 {
                                                     required: true,
                                                     message: 'Please enter the product category',
                                                 },
-                                                {
-                                                    type: 'string',
-                                                    min: 6,
-                                                    message: 'Category must be at least 6 characters long',
-                                                },
                                             ]}
                                         >
-                                            <Input placeholder="Product Category" />
-                                        </Form.Item>
-                                    </Col>
-
-                                    <Col span={6}>
-                                        <Form.Item
-                                            name="brand"
-                                            label="Brand"
-                                            rules={[
-                                                {
-                                                    required: true,
-                                                    message: 'Please enter the product name',
-                                                },
-                                                {
-                                                    type: 'string',
-                                                    min: 6,
-                                                    message: 'Name must be at least 6 characters long',
-                                                },
-                                            ]}
-                                        >
-                                            <Input placeholder="Product Name" />
+                                            <Input placeholder="eg. 50" type="number"/>
                                         </Form.Item>
                                     </Col>
                                 </Row>
 
 
                                 <Row gutter={16}>
-
-
-
-
                                     <Col span={24}>
                                         <div className="uploadfile pb-15 shadow-none">
-                                            <Upload {...formProps}>
+                                            <Upload 
+                                            fileList={fileList}
+                                            onChange={handleChangePicture}
+                                            beforeUpload={()=>false}>
                                                 <Button
                                                     type="dashed"
                                                     className="ant-full-box"
@@ -660,60 +729,46 @@ function Products() {
                                                     Upload Image
                                                 </Button>
                                             </Upload>
+                                            <div style={{ marginTop: 16 }}>
+                                                {fileList.map((file) => (
+                                                    <div key={file.uid} style={{ display: 'inline-block', marginRight: 8 }}>
+                                                        <img
+                                                            src={URL.createObjectURL(file.originFileObj)} // Create URL for preview
+                                                            alt="preview"
+                                                            style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 4 }}
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     </Col>
                                 </Row>
 
                                 <Row gutter={16}>
                                     <Col span={24}>
-                                        <TextArea label="Description" rows={3} placeholder="Product short decription" maxLength={6} />
+                                        <TextArea 
+                                            onChange={(e) => hanldeDescr(e.target.value)}
+                                            name="description"
+                                            label="Description" 
+                                            rows={3} 
+                                            placeholder="Product short decription" 
+                                            maxLength={500}/>
                                     </Col>
                                 </Row>
 
-                                <Row span={24}>
-
-                                    <div className="attributes">
-                                        <Tabs
-                                            defaultActiveKey="1"
-                                            type="card"
-                                            size={size}
-
-                                            items={[
-                                                {
-                                                    label: 'Attributes',
-                                                    key: '1',
-                                                    children: 'Content of Attributes tab',
-                                                },
-                                                {
-                                                    label: 'Attribute Value',
-                                                    key: '2',
-                                                    children: 'Content of Attribute Value tab',
-                                                },
-                                                {
-                                                    label: 'Sold As',
-                                                    key: '3',
-                                                    children: 'Content of Sold As tab',
-                                                },
-                                                {
-                                                    label: 'Price',
-                                                    key: '4',
-                                                    children: 'Content of Price tab',
-                                                },
-                                                {
-                                                    label: 'Tax',
-                                                    key: '5',
-                                                    children: 'Content of Tax tab',
-                                                },
-                                                {
-                                                    label: 'Inventory',
-                                                    key: '6',
-                                                    children: 'Content of Inventory tab',
-                                                },
-                                            ]}
-
-                                        />
-                                    </div>
-
+                                <Row gutter={16}>
+                                    <Col span={24}>
+                                        <Form.Item>
+                                            <Button 
+                                              type="primary" 
+                                              htmlType="submit"
+                                              style={{float: 'right',marginTop: '20px'}}
+                                              loading={loading}
+                                            >
+                                                Add Product
+                                            </Button>
+                                        </Form.Item>
+                                    </Col>
                                 </Row>
                             </Form>
                         </Modal>

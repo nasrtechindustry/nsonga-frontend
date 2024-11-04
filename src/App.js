@@ -14,7 +14,7 @@ import "./assets/styles/responsive.css";
 import Category from "./pages/category/category.js";
 import Brand from "./pages/brands/brand.js";  
 import Attributtes from "./pages/attributes/attributes";
-import Products from "./pages/products";
+import Products from "./pages/products/products.js";
 import SalesList from "./pages/sales";
 import Inventory from "./pages/inventory";
 import Reports from "./pages/reports";
