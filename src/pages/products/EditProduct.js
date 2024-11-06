@@ -7,6 +7,7 @@ import { SoldAs } from "./SoldAsTab";
 import CategorySelect from "./CategoryTab";
 import AttribSelect from "./AttributesTab";
 import BrandSelect from "./BrandTab";
+import { formToJSON } from "axios";
 
 const { TextArea } = Input;
 
@@ -19,11 +20,7 @@ function EditProduct() {
   const [fileList, setFileList] = useState([]); // Only one image
   const [btnLoading, setBtnLoading] = useState(false);
 
-  const [description, setDescription] = useState(null);
-  const [brand, setBrand] = useState(null);
-  const [attribute, setAttribute] = useState(null);
-  const [category, setCategory] = useState(null);
-  const [soldValue, setSoldValue] = useState(null);
+
 
   // Fetch product data when the component is mounted
   useEffect(() => {
@@ -32,6 +29,7 @@ function EditProduct() {
         setLoading(true);
         const response = await apiClient.get(`/products/${id}`);
         const productData = response.data.data;
+        // console.log(productData)
         setProduct(productData);
 
         // Set form fields
@@ -69,51 +67,28 @@ function EditProduct() {
 
   // Handle form submission
   const onFinish = async (values) => {
-    const payload = {
-      ...values,
-      description: description,
-      brand_id: brand,
-      attribute_id: attribute,
-      category_id: category,
-      sold_as: soldValue
-    };
 
     const formData = new FormData();
 
     // Append other fields to FormData
-    for (const key in payload) {
-      formData.append(key, payload[key]);
+    for (const key in values) {
+      formData.append(key, values[key]);
     }
 
-    // Debug: Log the formData keys and values before appending the image
-    console.log("Form Data (before image):");
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
 
     // Append the image file if available
     if (fileList.length > 0 && fileList[0].originFileObj) {
-      console.log("Appending image:", fileList[0].originFileObj); // Debug log to check the image file
+      // console.log("Appending image:", fileList[0].originFileObj); // Debug log to check the image file
       formData.append('image', fileList[0].originFileObj);
     }
 
-    // Debug: Log the final formData after appending the image
-    console.log("Form Data (after image):");
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
 
     try {
       setBtnLoading(true);
-
       // Send PUT request with FormData
-      const response = await apiClient.put(`/products/${id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data', // Ensure the content type is correct
-        },
-      });
+      const response = await apiClient.put(`/products/${id}`, formData);
 
-      console.log(response); // Log the response for debugging
+
       if (response.data.success) {
         message.success("Product updated successfully.");
         history.push("/products");
@@ -160,7 +135,7 @@ function EditProduct() {
             <Form.Item name="category_id" label="Category">
               <CategorySelect
                 value={form.getFieldValue("category_id")}
-                onSelect={(value) => setCategory(value)} />
+                onSelect={(value) => form.setFieldValue({ category_id: value })} />
             </Form.Item>
           </Col>
 
@@ -168,7 +143,7 @@ function EditProduct() {
             <Form.Item name="brand_id" label="Brand">
               <BrandSelect
                 value={form.getFieldValue("brand_id")}
-                onSelect={(value) => setBrand(value)} />
+                onSelect={(value) => form.setFieldValue({brand_id: value}) } />
             </Form.Item>
           </Col>
 
@@ -176,7 +151,7 @@ function EditProduct() {
             <Form.Item name="attribute_id" label="Attribute">
               <AttribSelect
                 value={form.getFieldValue("attribute_id")}
-                onSelect={(value) => setAttribute(value)} />
+                onSelect={(value) => form.setFieldValue({attribute_id: value})} />
             </Form.Item>
           </Col>
         </Row>
@@ -186,7 +161,7 @@ function EditProduct() {
             <Form.Item name="sold_as" label="Sold as">
               <SoldAs
                 value={form.getFieldValue("sold_as")}
-                onSelect={(value) => setSoldValue(value)} />
+                onSelect={(value) => form.setFieldValue({sold_as : value})} />
             </Form.Item>
           </Col>
 
@@ -244,7 +219,7 @@ function EditProduct() {
                 rows={3}
                 placeholder="Product short description"
                 maxLength={500}
-                onChange={(e) => setDescription(e.target.value)} />
+                onChange={(e) => form.setFieldValue({description: e.target.value})} />
             </Form.Item>
           </Col>
         </Row>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Select, Spin } from 'antd';  
 import apiClient from '../../axios-client.js';
+import { triggerFocus } from 'antd/lib/input/Input.js';
 
 export default function CategorySelect({ value, onSelect }) {
     const [categories, setCategories] = useState([]);

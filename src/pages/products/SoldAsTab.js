@@ -14,7 +14,7 @@ export const SoldAs = ({ value, onSelect }) => (
         value={value} 
         placeholder="-- Select Sold Type --"
         onChange={onSelect} 
-        showSearch
+        
     >
         {solds.map((attr) => (
             <Option key={attr.value} value={attr.value}>
