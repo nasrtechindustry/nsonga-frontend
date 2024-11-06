@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Select, Spin } from 'antd';  
 import apiClient from '../../axios-client.js';
 
-export default function AttribSelect({ value, onSelect }) {
+export default function AttribSelect({ value, onChange }) {
 
     const [attrib, setAttrib] = useState([]);
     const [loading, setLoading] = useState(true);  
@@ -31,7 +31,7 @@ export default function AttribSelect({ value, onSelect }) {
         <Select
             value={value}  
             placeholder="-- Select Attribute --"
-            onChange={onSelect}
+            onChange={onChange}
             loading={loading}  
             showSearch  
         >

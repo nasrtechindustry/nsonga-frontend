@@ -2,47 +2,45 @@ import React, { useEffect, useState } from 'react';
 import { Select, Spin } from 'antd';  
 import apiClient from '../../axios-client.js';
 
+export default function Status({ value, onChange }) {
 
-
-
-export default function CategorySelect({ value, onChange }) {
-    const [categories, setCategories] = useState([]);
+    const [attrib, setAttrib] = useState([]);
     const [loading, setLoading] = useState(true);  
+
     const { Option } = Select;
 
-    const fetchCategories = async () => {
+    const fetchAttrib = async () => {
         try {
             setLoading(true);  
-            const response = await apiClient.get('/category');
-            const data = response.data.data.map(cate => cate.object);
-            const mergeddata = data.flat();  
-            setCategories(mergeddata);
+            const response = await apiClient.get('/products');
+            const data = response.data.data.map(attr => attr.available);
+            const mergeddata = data.flat(); 
+            setAttrib(mergeddata);
         } catch (err) {
             console.log(err.message);
         } finally {
-            setLoading(false);  
+            setLoading(false); 
         }
     };
-
     useEffect(() => {
-        fetchCategories();
+        fetchAttrib();
     }, []);
 
     return (
         <Select
-            value={value}
-            placeholder="-- Select Category --"
+            value={value}  
+            placeholder="-- Select Attribute --"
             onChange={onChange}
             loading={loading}  
-            showSearch 
+            showSearch  
         >
             {loading ? (
                 <Option disabled>
                     <Spin size="small" /> Loading...
                 </Option>
             ) : (
-                categories.map((attr) => (
-                    <Option key={attr.id} value={attr.id}>
+                attrib.map((attr) => (
+                    <Option >
                         {attr.label}
                     </Option>
                 ))

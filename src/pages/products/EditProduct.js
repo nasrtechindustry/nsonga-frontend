@@ -1,4 +1,4 @@
-import { Row, Col, Button, Upload, Form, Input, message } from "antd";
+import { Row, Col, Button, Upload, Form, Input, message, Select} from "antd";
 import { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { ToTopOutlined } from "@ant-design/icons";
@@ -6,10 +6,13 @@ import apiClient from "../../axios-client";
 import { SoldAs } from "./SoldAsTab";
 import CategorySelect from "./CategoryTab";
 import AttribSelect from "./AttributesTab";
+import Status from "./StatusTab";
+
 import BrandSelect from "./BrandTab";
 import { formToJSON } from "axios";
 
 const { TextArea } = Input;
+const {Option} = Select;
 
 function EditProduct() {
   const [form] = Form.useForm();
@@ -43,6 +46,7 @@ function EditProduct() {
           tax: productData.tax,
           inventory: productData.inventory,
           description: productData.description,
+          status: productData.available
         });
 
         // Set initial image file if available
@@ -75,6 +79,10 @@ function EditProduct() {
       formData.append(key, values[key]);
     }
 
+    // for (const key in values) {
+    //   formData.append(key === 'status' ? 'available' : key, values[key]);
+    // }
+
 
     // Append the image file if available
     if (fileList.length > 0 && fileList[0].originFileObj) {
@@ -82,11 +90,16 @@ function EditProduct() {
       formData.append('image', fileList[0].originFileObj);
     }
 
+    // for debugging only
+    // for (const [key, value] of formData.entries()) {
+    //     console.log(key, value); // This will log each key and value in FormData
+    // }
+
 
     try {
       setBtnLoading(true);
       // Send PUT request with FormData
-      const response = await apiClient.put(`/products/${id}`, formData);
+      const response = await apiClient.put(`/products/${id}`, formData );
 
 
       if (response.data.success) {
@@ -135,7 +148,7 @@ function EditProduct() {
             <Form.Item name="category_id" label="Category">
               <CategorySelect
                 value={form.getFieldValue("category_id")}
-                onSelect={(value) => form.setFieldValue({ category_id: value })} />
+                onChange={(value) => form.setFieldValue({ category_id: value })} />
             </Form.Item>
           </Col>
 
@@ -143,7 +156,7 @@ function EditProduct() {
             <Form.Item name="brand_id" label="Brand">
               <BrandSelect
                 value={form.getFieldValue("brand_id")}
-                onSelect={(value) => form.setFieldValue({brand_id: value}) } />
+                onChange={(value) => form.setFieldValue({brand_id: value}) } />
             </Form.Item>
           </Col>
 
@@ -151,7 +164,7 @@ function EditProduct() {
             <Form.Item name="attribute_id" label="Attribute">
               <AttribSelect
                 value={form.getFieldValue("attribute_id")}
-                onSelect={(value) => form.setFieldValue({attribute_id: value})} />
+                onChange={(value) => form.setFieldValue({attribute_id: value})} />
             </Form.Item>
           </Col>
         </Row>
@@ -161,7 +174,8 @@ function EditProduct() {
             <Form.Item name="sold_as" label="Sold as">
               <SoldAs
                 value={form.getFieldValue("sold_as")}
-                onSelect={(value) => form.setFieldValue({sold_as : value})} />
+                onChange={(value) => form.setFieldValue({sold_as : value})} 
+              />
             </Form.Item>
           </Col>
 
@@ -183,6 +197,21 @@ function EditProduct() {
             </Form.Item>
           </Col>
         </Row>
+        <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
+          <Col span={6}>
+            <Form.Item
+              name="status"
+              label="Status"
+              rules={[{ required: true, message: "Please select the product status" }]}
+            >
+              <Select placeholder="Select status">
+                <Option value={1}>Available</Option>
+                <Option value={0}>Unavailable</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+      </Row>
+
 
         <Row gutter={16}>
           <Col span={24}>
@@ -230,11 +259,20 @@ function EditProduct() {
               <Button
                 type="primary"
                 htmlType="submit"
-                block
                 loading={btnLoading}
                 disabled={btnLoading}
               >
                 Save Changes
+              </Button>
+
+              <Button
+                type="info"
+                onClick={handleBack}
+                style={
+                  {marginLeft: "10px"}
+                }
+              >
+                Back
               </Button>
             </Form.Item>
           </Col>

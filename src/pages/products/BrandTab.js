@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Select, Spin } from 'antd';  // Importing Spin for the loading indicator
 import apiClient from '../../axios-client.js';
 
-export default function BrandSelect({ value, onSelect }) {
+export default function BrandSelect({ value, onChange }) {
 
     const [brands, setBrands] = useState([]);
     const [loading, setLoading] = useState(true);  // Track loading state
@@ -31,7 +31,7 @@ export default function BrandSelect({ value, onSelect }) {
         <Select
             value={value}
             placeholder="-- Select Brand --"
-            onChange={onSelect}
+            onChange={onChange}
             showSearch  // Optional: allows searching through the options
             loading={loading}  // Antd's built-in loading prop to show the spinner
         >

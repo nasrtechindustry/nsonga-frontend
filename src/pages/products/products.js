@@ -11,9 +11,6 @@ import { useHistory } from "react-router-dom";
 
 const { Title } = Typography;
 
-// const handleEdit = (key) => {
-//     console.log('Edit record with key:', key);
-// }
 
 function Products() {
     const history = useHistory();
@@ -88,9 +85,9 @@ function Products() {
         }
         
         // for debugging only
-        // for (const [key, value] of formData.entries()) {
-        //     console.log(key, value); // This will log each key and value in FormData
-        // }
+        for (const [key, value] of formData.entries()) {
+            console.log(key, value); // This will log each key and value in FormData
+        }
 
         try{
             isBtnLoading(true)
@@ -255,9 +252,7 @@ function Products() {
             employed: (
                 <>
                     <div className="ant-employed">
-                        <Button type="dashed" >
-                            Check
-                        </Button>
+                        {prod.inventory}
                     </div>
                 </>
             ),
@@ -370,7 +365,7 @@ function Products() {
                                             label="Category"
                                         
                                         >
-                                            <CategorySelect onSelect={(value)=>setCategory(value)} />
+                                            <CategorySelect onChange={(value)=>setCategory(value)} />
                                         </Form.Item>
                                     </Col>
 
@@ -380,7 +375,7 @@ function Products() {
                                             label="Brand"
                                            
                                         >
-                                            <BrandSelect onSelect={(value) => setBrand(value)} />
+                                            <BrandSelect onChange={(value) => setBrand(value)} />
                                         </Form.Item>
                                     </Col>
                                     <Col span={6}>
@@ -389,7 +384,7 @@ function Products() {
                                             label="Attribute"
                                             
                                         >
-                                            <AttribSelect onSelect={(value) => setAttribute(value)} />
+                                            <AttribSelect onChange={(value) => setAttribute(value)} />
                                         </Form.Item>
                                     </Col>
                                 </Row>
@@ -401,7 +396,7 @@ function Products() {
                                             name="sold_as"
                                             label="Sold as"
                                         >
-                                            <SoldAs onSelect={(value) => setSoldValue(value)}/>
+                                            <SoldAs onChange={(value) => setSoldValue(value)}/>
                                         </Form.Item>
                                     </Col>
 
@@ -449,6 +444,7 @@ function Products() {
                                         </Form.Item>
                                     </Col>
                                 </Row>
+                                
 
 
                                 <Row gutter={16}>
