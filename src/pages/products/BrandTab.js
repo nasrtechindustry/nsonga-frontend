@@ -1,39 +1,51 @@
 import React, { useEffect, useState } from 'react';
-import { Select } from 'antd';
+import { Select, Spin } from 'antd';  // Importing Spin for the loading indicator
 import apiClient from '../../axios-client.js';
 
-export default function BrandSelect({ onSelect }) {
+export default function BrandSelect({ value, onSelect }) {
 
-    const [brands ,setBrands] = useState([]);
+    const [brands, setBrands] = useState([]);
+    const [loading, setLoading] = useState(true);  // Track loading state
 
     const { Option } = Select;
 
     const fetchBrands = async () => {
-        try{
+        try {
+            setLoading(true);  // Set loading to true before fetching
             const response = await apiClient.get('/brands');
-            const data = response.data.map( c_brand => { return c_brand.object });
-            const mergeddata = data.flat() //i use this to merge an array from backdend
+            const data = response.data.map(c_brand => c_brand.object);
+            const mergeddata = data.flat();  // Merge arrays if necessary
             setBrands(mergeddata);
-        }catch(err){
+        } catch (err) {
             console.log(err.message);
+        } finally {
+            setLoading(false);  // Set loading to false once the fetch is done
         }
-    }
+    };
 
-
-    useEffect(()=>{
+    useEffect(() => {
         fetchBrands();
-    },[]);
+    }, []);
 
-   return(
+    return (
         <Select
+            value={value}
             placeholder="-- Select Brand --"
-            onChange={onSelect} 
+            onChange={onSelect}
+            showSearch  // Optional: allows searching through the options
+            loading={loading}  // Antd's built-in loading prop to show the spinner
         >
-            {brands.map((attr) => (
-                <Option key={attr.id} value={attr.id}>
-                    {attr.label}
+            {loading ? (  // If loading, show a spinner as the first option
+                <Option disabled>
+                    <Spin size="small" /> Loading...
                 </Option>
-            ))}
+            ) : (
+                brands.map((attr) => (
+                    <Option key={attr.id} value={attr.id}>
+                        {attr.label}
+                    </Option>
+                ))
+            )}
         </Select>
     );
-};
+}

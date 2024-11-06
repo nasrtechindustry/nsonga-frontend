@@ -1,452 +1,24 @@
 import { Row, Col, Card, Radio, Table, message, Button, Avatar, Typography, Modal, Upload, Tabs, Form, Input, Space, Select} from "antd";
 import { DeleteOutlined, EditOutlined, ToTopOutlined } from "@ant-design/icons";
 import Draggable from 'react-draggable';
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SoldAs } from "./SoldAsTab";
 import CategorySelect  from "./CategoryTab";
 import AttribSelect  from "./AttributesTab";
 import BrandSelect from "./BrandTab";
 import apiClient from "../../axios-client";
-
-
-
-const face = "https://images.pexels.com/photos/5217897/pexels-photo-5217897.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2";
-const face2 = "https://images.unsplash.com/photo-1604603815783-2bd94c5a819f?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
-const face3 = "https://images.pexels.com/photos/5218014/pexels-photo-5218014.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2";
-const face4 = "https://images.pexels.com/photos/7262480/pexels-photo-7262480.jpeg?auto=compress&cs=tinysrgb&w=800";
-const face5 = "https://images.pexels.com/photos/5217911/pexels-photo-5217911.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2";
-const face6 = "https://images.pexels.com/photos/5217911/pexels-photo-5217911.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2";
-
-
+import { useHistory } from "react-router-dom";
 
 const { Title } = Typography;
 
-
-// table code start
-
-const columns = [
-    {
-        title: "Id",
-        dataIndex: "id",
-        key: "id",
-        width: "3%",
-    },
-    {
-        title: "Product",
-        dataIndex: "name",
-        key: "name",
-        width: "32%",
-    },
-    {
-        title: "Category",
-        dataIndex: "category",
-        key: "category",
-    },
-
-    {
-        title: "STATUS",
-        key: "status",
-        dataIndex: "status",
-    },
-
-    {
-        title: "Inventory",
-        key: "employed",
-        dataIndex: "employed",
-    },
-
-    {
-        title: "Actions",
-        key: "actions",
-        render: (_, record) => (
-            <>
-                <Button
-                    type="text"
-
-                    icon={<EditOutlined style={{ color: 'orange' }} />}
-                    onClick={() => handleEdit(record.key)}
-                    style={{ padding: 2, width: 'auto' }}
-                />
-                <Button
-                    type="text"
-                    icon={<DeleteOutlined style={{ color: 'red' }} />}
-                    onClick={() => handleDelete(record.key)}
-                    style={{ padding: 0, width: 'auto' }}
-                />
-            </>
-
-        ),
-    },
-];
-
-const data = [
-    {
-        key: "1",
-        id: (
-            <>
-                <div className="author-info">
-                    <Title level={5}>#001</Title>
-                </div>
-            </>
-        ),
-        name: (
-            <>
-                <Avatar.Group>
-                    <Avatar
-                        className="shape-avatar"
-                        shape="square"
-                        size={60}
-                        src={face2}
-                    ></Avatar>
-                    <div className="avatar-info">
-                        <Title level={5}>Dishwashing</Title>
-                        <p>Nsonga brand 002</p>
-                    </div>
-                </Avatar.Group>{" "}
-            </>
-        ),
-        category: (
-            <>
-                <div className="author-info">
-                    <p>Category007</p>
-                </div>
-            </>
-        ),
-        function: (
-            <>
-                <div className="author-info">
-                    <Title level={5}>Manager</Title>
-                    <p>Organization</p>
-                </div>
-            </>
-        ),
-
-        status: (
-            <>
-                <Button type="primary" className="tag-primary">
-                    Availlable
-                </Button>
-            </>
-        ),
-        employed: (
-            <>
-                <div className="ant-employed">
-                    <Button type="dashed" >
-                        Check
-                    </Button>
-                </div>
-            </>
-        ),
-    },
-
-    {
-        key: "2",
-        id: (
-            <>
-                <div className="author-info">
-                    <Title level={5}>#002</Title>
-                </div>
-            </>
-        ),
-        name: (
-            <>
-                <Avatar.Group>
-                    <Avatar
-                        className="shape-avatar"
-                        shape="square"
-                        size={60}
-                        src={face3}
-                    ></Avatar>
-                    <div className="avatar-info">
-                        <Title level={5}>Handwash</Title>
-                        <p>Nsonga brand 005</p>
-                    </div>
-                </Avatar.Group>{" "}
-            </>
-        ),
-        category: (
-            <>
-                <div className="author-info">
-                    <p>Category001</p>
-                </div>
-            </>
-        ),
-        function: (
-            <>
-                <div className="author-info">
-                    <Title level={5}>Programator</Title>
-                    <p>Developer</p>
-                </div>
-            </>
-        ),
-
-        status: (
-            <>
-                <Button className="tag-badge">Avallable</Button>
-            </>
-        ),
-        employed: (
-            <>
-                <div className="ant-employed">
-                    <Button type="dashed" >
-                        Check
-                    </Button>
-
-                </div>
-            </>
-        ),
-    },
-
-    {
-        key: "3",
-        id: (
-            <>
-                <div className="author-info">
-                    <Title level={5}>#003</Title>
-                </div>
-            </>
-        ),
-        name: (
-            <>
-                <Avatar.Group>
-                    <Avatar
-                        className="shape-avatar"
-                        shape="square"
-                        size={60}
-                        src={face}
-                    ></Avatar>
-                    <div className="avatar-info">
-                        <Title level={5}>Multipurpose</Title>
-                        <p>Nsonga brand 001</p>
-                    </div>
-                </Avatar.Group>{" "}
-            </>
-        ),
-        category: (
-            <>
-                <div className="author-info">
-                    <p>Category004</p>
-                </div>
-            </>
-        ),
-        function: (
-            <>
-                <div className="author-info">
-                    <Title level={5}>Executive</Title>
-                    <p>Projects</p>
-                </div>
-            </>
-        ),
-
-        status: (
-            <>
-                <Button type="primary" className="tag-primary">
-                    Availlable
-                </Button>
-            </>
-        ),
-        employed: (
-            <>
-                <div className="ant-employed">
-                    <Button type="dashed" >
-                        Check
-                    </Button>
-                </div>
-            </>
-        ),
-    },
-    {
-        key: "4",
-        id: (
-            <>
-                <div className="author-info">
-                    <Title level={5}>#004</Title>
-                </div>
-            </>
-        ),
-        name: (
-            <>
-                <Avatar.Group>
-                    <Avatar
-                        className="shape-avatar"
-                        shape="square"
-                        size={60}
-                        src={face4}
-                    ></Avatar>
-                    <div className="avatar-info">
-                        <Title level={5}>Tiles Cleaner</Title>
-                        <p>Nsonga brand 002</p>
-                    </div>
-                </Avatar.Group>{" "}
-            </>
-        ),
-        category: (
-            <>
-                <div className="author-info">
-                    <p>Category001</p>
-                </div>
-            </>
-        ),
-        function: (
-            <>
-                <div className="author-info">
-                    <Title level={5}>Marketing</Title>
-                    <p>Organization</p>
-                </div>
-            </>
-        ),
-
-        status: (
-            <>
-                <Button type="primary" className="tag-primary">
-                    Availlable
-                </Button>
-            </>
-        ),
-        employed: (
-            <>
-                <div className="ant-employed">
-                    <Button type="dashed" >
-                        Check
-                    </Button>
-
-                </div>
-            </>
-        ),
-    },
-    {
-        key: "5",
-        id: (
-            <>
-                <div className="author-info">
-                    <Title level={5}>#005</Title>
-                </div>
-            </>
-        ),
-        name: (
-            <>
-                <Avatar.Group>
-                    <Avatar
-                        className="shape-avatar"
-                        shape="square"
-                        size={60}
-                        src={face5}
-                    ></Avatar>
-                    <div className="avatar-info">
-                        <Title level={5}>Rust remover</Title>
-                        <p>Nsonga brand 002</p>
-                    </div>
-                </Avatar.Group>{" "}
-            </>
-        ),
-        category: (
-            <>
-                <div className="author-info">
-                    <p>Category005</p>
-                </div>
-            </>
-        ),
-        function: (
-            <>
-                <div className="author-info">
-                    <Title level={5}>Manager</Title>
-                    <p>Organization</p>
-                </div>
-            </>
-        ),
-
-        status: (
-            <>
-                <Button className="tag-badge">Unavaillable</Button>
-            </>
-        ),
-        employed: (
-            <>
-                <div className="ant-employed">
-                    <Button type="dashed" >
-                        Check
-                    </Button>
-
-                </div>
-            </>
-        ),
-    },
-
-    {
-        key: "6",
-        id: (
-            <>
-                <div className="author-info">
-                    <Title level={5}>#006</Title>
-                </div>
-            </>
-        ),
-        name: (
-            <>
-                <Avatar.Group>
-                    <Avatar
-                        className="shape-avatar"
-                        shape="square"
-                        size={60}
-                        src={face6}
-                    ></Avatar>
-                    <div className="avatar-info">
-                        <Title level={5}>Blood remover</Title>
-                        <p>Nsonga brand 006</p>
-                    </div>
-                </Avatar.Group>{" "}
-            </>
-        ),
-        category: (
-            <>
-                <div className="author-info">
-                    <p>Category001</p>
-                </div>
-            </>
-        ),
-        function: (
-            <>
-                <div className="author-info">
-                    <Title level={5}>Tester</Title>
-                    <p>Developer</p>
-                </div>
-            </>
-        ),
-
-        status: (
-            <>
-                <Button className="tag-badge">Unavaillable</Button>
-            </>
-        ),
-        employed: (
-            <>
-                <div className="ant-employed">
-                    <Button type="dashed" >
-                        Check
-                    </Button>
-
-
-                </div>
-            </>
-        ),
-    },
-];
-
-// Your delete handler function
-const handleDelete = (key) => {
-    // Logic to delete the row
-    console.log('Delete record with key:', key);
-    // Add your delete logic here, such as updating the state or calling an API
-};
-
-const handleEdit = (key) => {
-    console.log('Edit record with key:', key);
-}
-
+// const handleEdit = (key) => {
+//     console.log('Edit record with key:', key);
+// }
 
 function Products() {
-
+    const history = useHistory();
     const [loading,isLoading] = useState(false);
+    const [btnLoading,isBtnLoading] = useState(false);
     const [description,setDescription] = useState(null);
     const [brand, setBrand] = useState(null);
     const [attribute, setAttribute] = useState(null);
@@ -487,8 +59,6 @@ function Products() {
         });
     };
 
-
-
     const [form] = Form.useForm();
     const [fileList, setFileList] = useState([]);
 
@@ -523,7 +93,7 @@ function Products() {
         // }
 
         try{
-            isLoading(true)
+            isBtnLoading(true)
             const response = await apiClient.post('/products',formData ,{
                 headers: {
                     'Content-Type' : 'multipart/form-data',
@@ -533,6 +103,7 @@ function Products() {
                 message.success(response.data.message);
                 form.resetFields(); 
                 setFileList([]); 
+                setOpen(false);
             } else {
                 message.error(response.data.message || 'Failed to upload product');
             }
@@ -542,7 +113,7 @@ function Products() {
             message.error('An error occurred while uploading the product');
         }
         finally{
-            isLoading(false);
+            isBtnLoading(false);
             setDescription(null)
         }
     };
@@ -559,6 +130,172 @@ function Products() {
         setDescription(event)
     }
 
+    const [products, setProducts] = useState([]);
+    const fetchAllProducts = async () => {
+
+        try{
+            isLoading(true);
+            const response = await apiClient.get('/products');
+            const prodArray = response.data.data.map(prod => {return prod})
+            setProducts(prodArray);
+            fetchAllProducts()
+
+        }catch(error){
+            console.log(error.message)
+        }
+        finally{
+            isLoading(false);
+        }
+    }
+
+    useEffect(()=>{fetchAllProducts()},[]);
+
+    const columns = [
+        {
+            title: "Id",
+            dataIndex: "id",
+            key: "id",
+            width: "3%",
+        },
+        {
+            title: "Product",
+            dataIndex: "name",
+            key: "name",
+            width: "32%",
+        },
+        {
+            title: "Category",
+            dataIndex: "category",
+            key: "category",
+        },
+    
+        {
+            title: "STATUS",
+            key: "status",
+            dataIndex: "status",
+        },
+    
+        {
+            title: "Inventory",
+            key: "employed",
+            dataIndex: "employed",
+        },
+    
+        {
+            title: "Actions",
+            key: "actions",
+            render: (_, record) => (
+                <>
+                    <Button
+                        type="text"
+    
+                        icon={<EditOutlined style={{ color: 'orange' }} />}
+                        onClick={() => handleEdit(record.key)}
+                        style={{ padding: 2, width: 'auto' }}
+                    />
+                    <Button
+                        type="text"
+                        icon={<DeleteOutlined style={{ color: 'red' }} />}
+                        onClick={() => handleDelete(record.key)}
+                        style={{ padding: 0, width: 'auto' }}
+                    />
+                </>
+    
+            ),
+        },
+    ];
+    
+    const data = products.map((prod,index) => {
+       return (
+        {
+            key: prod.id,
+            id : (
+                <>
+                    <div className="author-info">
+                        <Title level={5}>{index < 9 ? `0${index + 1}`: index + 1}</Title>
+                    </div>
+                </>
+            ),
+            name: (
+                <>
+                    <Avatar.Group>
+                        <Avatar
+                            className="shape-avatar"
+                            shape="square"
+                            size={60}
+                            src={prod.image_url}
+                        ></Avatar>
+                        <div className="avatar-info">
+                            <Title level={5}>{prod.name.charAt(0).toUpperCase() + prod.name.slice(1)}</Title>
+                            <p>{prod.brand_name}</p>
+                        </div>
+                    </Avatar.Group>{" "}
+                </>
+            ),
+            category: (
+                <>
+                    <div className="author-info">
+                        <p>{prod.category_name}</p>
+                    </div>
+                </>
+            ),
+            status: (
+                <div
+                    style={{
+                        backgroundColor: prod.available ? '#007bff' : '#dc3545',
+                        color: 'white', 
+                        padding: '5px 10px',
+                        borderRadius: '5px', 
+                        textAlign: 'center' 
+                    }}
+                >
+                    {prod.available ? 'Available' : 'Unavailable'}
+                </div>
+            ),
+            employed: (
+                <>
+                    <div className="ant-employed">
+                        <Button type="dashed" >
+                            Check
+                        </Button>
+                    </div>
+                </>
+            ),
+        }
+       );
+    });
+
+
+    // Your delete handler function
+    // Handle the deletion before ask the user:
+    const handleDelete = async (key) => {
+        Modal.confirm({
+            title: 'Are you sure you want to delete this product?',
+            content: 'Once deleted, you will not be able to recover this product.',
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk: async () => {
+                try {
+                    const response = await apiClient.delete(`/products/${key}`);
+    
+                    if (response.data.success) {
+                        message.success(response.data.message || "Product deleted successfully");
+                        fetchAllProducts();
+                    } else {
+                        message.error(response.data.message || "There was an error while deleting");
+                    }
+                } catch (error) {
+                    console.error(error.message);
+                    message.error("An unexpected error occurred.");
+                } 
+            },
+        });
+    }   
+    
+    const handleEdit = (key) => {
+        history.push(`/products/edit/${key}`); // Navigate to the edit route with product ID
+    };
     return (
         <>
             <div className="tabled">
@@ -717,7 +454,7 @@ function Products() {
                                 <Row gutter={16}>
                                     <Col span={24}>
                                         <div className="uploadfile pb-15 shadow-none">
-                                            <Upload 
+                                        <Upload 
                                             fileList={fileList}
                                             onChange={handleChangePicture}
                                             beforeUpload={()=>false}>
@@ -763,7 +500,7 @@ function Products() {
                                               type="primary" 
                                               htmlType="submit"
                                               style={{float: 'right',marginTop: '20px'}}
-                                              loading={loading}
+                                              loading={btnLoading}
                                             >
                                                 Add Product
                                             </Button>
@@ -791,6 +528,7 @@ function Products() {
                                     columns={columns}
                                     dataSource={data}
                                     pagination={true}
+                                    loading={loading}
                                     className="ant-border-space"
                                 />
                             </div>

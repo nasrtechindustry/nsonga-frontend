@@ -1,39 +1,49 @@
 import React, { useEffect, useState } from 'react';
-import { Select } from 'antd';
+import { Select, Spin } from 'antd';  
 import apiClient from '../../axios-client.js';
 
-export default function CategorySelect({ onSelect }) {
-
-    const [categories ,setCategories] = useState([]);
-
+export default function CategorySelect({ value, onSelect }) {
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);  
     const { Option } = Select;
 
     const fetchCategories = async () => {
-        try{
+        try {
+            setLoading(true);  
             const response = await apiClient.get('/category');
-            const data = response.data.data.map( cate => { return cate.object });
-            const mergeddata = data.flat() //i use this to merge an array from backdend
+            const data = response.data.data.map(cate => cate.object);
+            const mergeddata = data.flat();  
             setCategories(mergeddata);
-        }catch(err){
+        } catch (err) {
             console.log(err.message);
+        } finally {
+            setLoading(false);  
         }
-    }
+    };
 
-
-    useEffect(()=>{
+    useEffect(() => {
         fetchCategories();
-    },[]);
+    }, []);
 
-   return(
+    return (
         <Select
+            value={value}
             placeholder="-- Select Category --"
-            onChange={onSelect} 
+            onChange={onSelect}
+            loading={loading}  
+            showSearch 
         >
-            {categories.map((attr) => (
-                <Option key={attr.id} value={attr.id}>
-                    {attr.label}
+            {loading ? (
+                <Option disabled>
+                    <Spin size="small" /> Loading...
                 </Option>
-            ))}
+            ) : (
+                categories.map((attr) => (
+                    <Option key={attr.id} value={attr.id}>
+                        {attr.label}
+                    </Option>
+                ))
+            )}
         </Select>
     );
-};
+}

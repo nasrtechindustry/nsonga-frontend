@@ -1,6 +1,7 @@
 
 import {BrowserRouter as Router, Switch, Route, Redirect , useHistory} from "react-router-dom";
 import Home from "./pages/Home";
+
 import Tables from "./pages/Tables";
 import Billing from "./pages/Billing";
 import Rtl from "./pages/Rtl";
@@ -15,6 +16,7 @@ import Category from "./pages/category/category.js";
 import Brand from "./pages/brands/brand.js";  
 import Attributtes from "./pages/attributes/attributes";
 import Products from "./pages/products/products.js";
+import EditProduct from "./pages/products/EditProduct.js";
 import SalesList from "./pages/sales";
 import Inventory from "./pages/inventory";
 import Reports from "./pages/reports";
@@ -63,6 +65,7 @@ function App() {
               render={() => (isAuth ? <Redirect to="/dashboard" /> : <SignUp setAuth={setAuth}/>)}
             />
 
+
             {isAuth ? (
               <Main>
                 <Switch>
@@ -72,6 +75,7 @@ function App() {
                   <Route exact path="/brands" component={Brand} />
                   <Route exact path="/attributes" component={Attributtes} />
                   <Route exact path="/products" component={Products} />
+                  <Route path="/products/edit/:id" component={EditProduct} />
                   <Route exact path="/sales" component={SalesList} />
                   <Route exact path="/inventory" component={Inventory} />
                   <Route exact path="/reports" component={Reports} />
