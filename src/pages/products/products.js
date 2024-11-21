@@ -69,7 +69,7 @@ function Products() {
             brand_id:brand,
             attribute_id:attribute,
             category_id:category,
-            'sold_as': soldValue
+            sold_as: soldValue
         }
 
         const formData = new FormData();
@@ -135,8 +135,6 @@ function Products() {
             const response = await apiClient.get('/products');
             const prodArray = response.data.data.map(prod => {return prod})
             setProducts(prodArray);
-            fetchAllProducts()
-
         }catch(error){
             console.log(error.message)
         }
@@ -289,7 +287,7 @@ function Products() {
     }   
     
     const handleEdit = (key) => {
-        history.push(`/products/edit/${key}`); // Navigate to the edit route with product ID
+        history.push(`/products/edit/${key}`);// Navigate to the edit route with product ID
     };
     return (
         <>

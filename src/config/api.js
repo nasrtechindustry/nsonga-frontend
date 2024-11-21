@@ -10,8 +10,7 @@ export function getToken() {
     return localStorage.getItem('nsonga-auth-token') || '';
 }
 
-
-// Refactored performLoginRequest to store the token in local storage
+// Refactored pe  rformLoginRequest to store the token in local storage
 export const performLoginRequest = async (payload) => {
     // eslint-disable-next-line no-useless-catch
     try {
@@ -49,9 +48,6 @@ export const performAploadPostRequest = (endURL, payload, accessToken = null) =>
         return response.data;
     });
 };
-
-
-
 
 // Generic function for POST requests
 export const performPostRequest = (endURL, payload, accessToken = null) => {

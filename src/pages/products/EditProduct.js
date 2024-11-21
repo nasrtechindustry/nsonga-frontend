@@ -32,7 +32,7 @@ function EditProduct() {
         setLoading(true);
         const response = await apiClient.get(`/products/${id}`);
         const productData = response.data.data;
-        // console.log(productData)
+
         setProduct(productData);
 
         // Set form fields
@@ -46,7 +46,7 @@ function EditProduct() {
           tax: productData.tax,
           inventory: productData.inventory,
           description: productData.description,
-          status: productData.available
+          available: productData.available
         });
 
         // Set initial image file if available
@@ -76,12 +76,10 @@ function EditProduct() {
 
     // Append other fields to FormData
     for (const key in values) {
+
       formData.append(key, values[key]);
     }
 
-    // for (const key in values) {
-    //   formData.append(key === 'status' ? 'available' : key, values[key]);
-    // }
 
 
     // Append the image file if available
@@ -89,11 +87,11 @@ function EditProduct() {
       // console.log("Appending image:", fileList[0].originFileObj); // Debug log to check the image file
       formData.append('image', fileList[0].originFileObj);
     }
-
+ 
     // for debugging only
-    // for (const [key, value] of formData.entries()) {
-    //     console.log(key, value); // This will log each key and value in FormData
-    // }
+    for (const [key, value] of formData.entries()) {
+        console.log(key, value); // This will log each key and value in FormData
+    }
 
 
     try {
@@ -200,14 +198,15 @@ function EditProduct() {
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
           <Col span={6}>
             <Form.Item
-              name="status"
+              name="available"
               label="Status"
               rules={[{ required: true, message: "Please select the product status" }]}
             >
-              <Select placeholder="Select status">
-                <Option value={1}>Available</Option>
-                <Option value={0}>Unavailable</Option>
+              <Select placeholder="Select status" >
+                <Option value={1} onChange={(value) => form.setFieldValue({available: value})}>Available</Option>
+                <Option value={0} onChange={(value) => form.setFieldValue({available: value})}>Unavailable</Option>
               </Select>
+
             </Form.Item>
           </Col>
       </Row>
