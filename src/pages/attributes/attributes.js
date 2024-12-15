@@ -22,7 +22,7 @@ const Attribute = () => {
     const fetchAttributes = async (page = 1, pageSize = 3) => {
         setLoading(true);
         try {
-            const response = await apiClient.get("http://localhost:8000/api/attributes", {
+            const response = await apiClient.get(`${process.env.REACT_APP_API_BASE_URL}/attributes`, {
                 params: { page, pageSize },
             });
             setDataSource(response.data.data); // Adjust based on your API response structure
@@ -46,7 +46,7 @@ const Attribute = () => {
     const onFinish = async (values) => {
         setActionLoading(true);
         try {
-            const response = await apiClient.post("http://localhost:8000/api/attributes", values);
+            const response = await apiClient.post(`${process.env.REACT_APP_API_BASE_URL}/attributes`, values);
             message.success("Attribute added successfully!");
             setDataSource([...dataSource, response.data.data]); // Add the new attribute to the state
             form.resetFields(); // Reset form fields
@@ -86,7 +86,7 @@ const Attribute = () => {
             setLoading(true);
             const updatedAttribute = form.getFieldValue("name");
             const updatedUnit = form.getFieldValue("unit");
-            await apiClient.put(`http://localhost:8000/api/attributes/${selectedAttribute.id}`, {
+            await apiClient.put(`${process.env.REACT_APP_API_BASE_URL}/attributes/${selectedAttribute.id}`, {
                 name: updatedAttribute,
                 unit: updatedUnit, // Send unit data in the request
             });
@@ -112,7 +112,7 @@ const Attribute = () => {
     const handleDeleteConfirm = async () => {
         setLoading(true);
         try {
-            await apiClient.delete(`http://localhost:8000/api/attributes/${selectedAttribute.id}`);
+            await apiClient.delete(`${process.env.REACT_APP_API_BASE_URL}/attributes/${selectedAttribute.id}`);
             message.success("Attribute deleted successfully!");
             setDataSource((prevData) =>
                 prevData.filter((item) => item.id !== selectedAttribute.id)

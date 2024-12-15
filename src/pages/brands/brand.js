@@ -22,7 +22,7 @@ const Brand = () => {
     const fetchBrands = async (page = 1, pageSize = 3) => {
         setLoading(true);
         try {
-            const response = await apiClient.get("http://localhost:8000/api/brands", {
+            const response = await apiClient.get(`${process.env.REACT_APP_API_BASE_URL}/brands`, {
                 params: { page, pageSize },
             });
             setDataSource(response.data); // Adjust based on your API response structure
@@ -46,7 +46,7 @@ const Brand = () => {
     const onFinish = async (values) => {
         setBtnLoading(true);
         try {
-            const response = await apiClient.post("http://localhost:8000/api/brands", values);
+            const response = await apiClient.post(`${process.env.REACT_APP_API_BASE_URL}/brands`, values);
             message.success("Brand added successfully!");
             setDataSource([...dataSource, response.data]); // Add the new brand to the state
             form.resetFields(); // Reset form fields
@@ -80,7 +80,7 @@ const Brand = () => {
         try {
             setLoading(true)
             const updatedBrand = form.getFieldValue("name");
-            await apiClient.put(`http://localhost:8000/api/brands/${selectedBrand.id}`, {
+            await apiClient.put(`${process.env.REACT_APP_API_BASE_URL}/brands/${selectedBrand.id}`, {
                 name: updatedBrand,
             });
             message.success("Brand updated successfully!");
@@ -105,7 +105,7 @@ const Brand = () => {
     const handleDeleteConfirm = async () => {
         setLoading(true);
         try {
-            await apiClient.delete(`http://localhost:8000/api/brands/${selectedBrand.id}`);
+            await apiClient.delete(`${process.env.REACT_APP_API_BASE_URL}/brands/${selectedBrand.id}`);
             message.success("Brand deleted successfully!");
             setDataSource((prevData) =>
                 prevData.filter((item) => item.id !== selectedBrand.id)

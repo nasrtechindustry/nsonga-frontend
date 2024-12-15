@@ -22,7 +22,7 @@ const Categories = () => {
     const fetchCategories = async (page = 1, pageSize = 3) => {
         setLoading(true);
         try {
-            const response = await apiClient.get("http://localhost:8000/api/category", {
+            const response = await apiClient.get(`${process.env.REACT_APP_API_BASE_URL}/category`, {
                 params: { page, pageSize },
             });
             setDataSource(response.data.data); // Adjust based on your API response structure
@@ -47,7 +47,7 @@ const Categories = () => {
         setBtnLoading(true);
 
         try {
-            const response = await apiClient.post("http://localhost:8000/api/category", values);
+            const response = await apiClient.post(`${process.env.REACT_APP_API_BASE_URL}/category`, values);
             message.success("Category added successfully!");
             setDataSource([...dataSource, response.data.data]); // Add the new category to the state
             form.resetFields(); // Reset form fields
@@ -93,7 +93,7 @@ const Categories = () => {
         setLoading(true);
         try {
             const updatedCategory = form.getFieldValue("name");
-            await apiClient.put(`http://localhost:8000/api/category/${selectedCategory.id}`, {
+            await apiClient.put(`${process.env.REACT_APP_API_BASE_URL}/category/${selectedCategory.id}`, {
                 name: updatedCategory,
             }).then(response => {
                 if(response.data.success){
@@ -123,7 +123,7 @@ const Categories = () => {
     const handleDeleteConfirm = async () => {
         setLoading(true);
         try {
-            await apiClient.delete(`http://localhost:8000/api/category/${selectedCategory.id}`);
+            await apiClient.delete(`${process.env.REACT_APP_API_BASE_URL}/category/${selectedCategory.id}`);
             message.success("Category deleted successfully!");
             setDataSource((prevData) =>
                 prevData.filter((item) => item.id !== selectedCategory.id)

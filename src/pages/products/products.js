@@ -91,7 +91,7 @@ function Products() {
 
         try{
             isBtnLoading(true)
-            const response = await apiClient.post('/products',formData ,{
+            const response = await apiClient.post(`${process.env.REACT_APP_API_BASE_URL}/products`,formData ,{
                 headers: {
                     'Content-Type' : 'multipart/form-data',
                 }
@@ -132,7 +132,7 @@ function Products() {
 
         try{
             isLoading(true);
-            const response = await apiClient.get('/products');
+            const response = await apiClient.get(`${process.env.REACT_APP_API_BASE_URL}/products`);
             const prodArray = response.data.data.map(prod => {return prod})
             setProducts(prodArray);
         }catch(error){
@@ -147,19 +147,19 @@ function Products() {
 
     const columns = [
         {
-            title: "Id",
+            title: "ID",
             dataIndex: "id",
             key: "id",
             width: "3%",
         },
         {
-            title: "Product",
+            title: "PRODUCT",
             dataIndex: "name",
             key: "name",
             width: "32%",
         },
         {
-            title: "Category",
+            title: "CATEGORY",
             dataIndex: "category",
             key: "category",
         },
@@ -171,13 +171,13 @@ function Products() {
         },
     
         {
-            title: "Inventory",
+            title: "INVENTORY",
             key: "employed",
             dataIndex: "employed",
         },
     
         {
-            title: "Actions",
+            title: "ACTIONS",
             key: "actions",
             render: (_, record) => (
                 <>
@@ -270,7 +270,7 @@ function Products() {
             cancelText: 'No',
             onOk: async () => {
                 try {
-                    const response = await apiClient.delete(`/products/${key}`);
+                    const response = await apiClient.delete(`${process.env.REACT_APP_API_BASE_URL}/products/${key}`);
     
                     if (response.data.success) {
                         message.success(response.data.message || "Product deleted successfully");

@@ -34,6 +34,9 @@ export default class SignIn extends Component {
       password: values.password,
       remember: values.remember,
     };
+
+  // console.log(process.env.REACT_APP_API_BASE_URL);
+
   
     apiClient.post('/login', payload)
       .then(response => {
