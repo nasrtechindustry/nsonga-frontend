@@ -1,23 +1,8 @@
-import {
-    Row,
-    Col,
-    Card,
-    Radio,
-    Table,
-    message,
-    Button,
-    Avatar,
-    Typography,
-    Modal,
-    Upload,
-    Tabs,
-    Form, Input, Space
-} from "antd";
+import { Row, Col, Card, Radio, Table, message, Button, Avatar, Typography, Modal, Upload, Tabs, Form, Input, Space} from "antd";
 import { DeleteOutlined, EditOutlined, ToTopOutlined } from "@ant-design/icons";
-
-
 import Draggable from 'react-draggable';
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { fetchAllProducts } from "../products/productFetcher";
 
 
 
@@ -28,7 +13,7 @@ const face4 = "https://images.pexels.com/photos/7262480/pexels-photo-7262480.jpe
 const face5 = "https://images.pexels.com/photos/5217911/pexels-photo-5217911.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2";
 const face6 = "https://images.pexels.com/photos/5217911/pexels-photo-5217911.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2";
 
-
+function Inventory() {
 
 const { Title } = Typography;
 
@@ -50,6 +35,11 @@ const formProps = {
     },
 };
 // table code start
+
+const [product , setProduct]  = useState([]);
+const [loading , isLoading] = useState(false)
+
+useEffect( () => {fetchAllProducts(setProduct , isLoading)} ,[])
 
 const columns = [
     {
@@ -89,208 +79,51 @@ const columns = [
         key: "inventory",
         dataIndex: "inventory",
     },
+    
 ];
 
-const data = [
-    {
-        key: "1",
-        id: (
-            <div className="author-info">
-                <Title level={5}>#001</Title>
-            </div>
-        ),
-        name: (
-            <Avatar.Group>
-                <Avatar
-                    className="shape-avatar"
-                    shape="square"
-                    size={60}
-                    src={face2}
-                />
-                <div className="avatar-info">
-                    <Title level={5}>Dishwashing</Title>
-                    <p>Nsonga brand 002</p>
-                </div>
-            </Avatar.Group>
-        ),
-        attribute: (
-            <div className="author-info">
-                <p>Litre (7)</p>
-            </div>
-        ),
-        tax: "15%",
-        price: "TSh 5000",
-        selling_price: "TSh 5500",
-        inventory: (
-            <Input placeholder="234" value="278" />
-        ),
-    },
-    {
-        key: "2",
-        id: (
-            <div className="author-info">
-                <Title level={5}>#002</Title>
-            </div>
-        ),
-        name: (
-            <Avatar.Group>
-                <Avatar
-                    className="shape-avatar"
-                    shape="square"
-                    size={60}
-                    src={face3}
-                />
-                <div className="avatar-info">
-                    <Title level={5}>Handwash</Title>
-                    <p>Nsonga brand 005</p>
-                </div>
-            </Avatar.Group>
-        ),
-        attribute: (
-            <div className="author-info">
-                <p>Litre (1)</p>
-            </div>
-        ),
-        tax: "10%",
-        price: "TSh 6000",
-        selling_price: "TSh 6500",
-        inventory: (
-            <Input placeholder="234" value="87" />
-        ),
-    },
-    {
-        key: "3",
-        id: (
-            <div className="author-info">
-                <Title level={5}>#003</Title>
-            </div>
-        ),
-        name: (
-            <Avatar.Group>
-                <Avatar
-                    className="shape-avatar"
-                    shape="square"
-                    size={60}
-                    src={face}
-                />
-                <div className="avatar-info">
-                    <Title level={5}>Multipurpose</Title>
-                    <p>Nsonga brand 001</p>
-                </div>
-            </Avatar.Group>
-        ),
-        attribute: (
-            <div className="author-info">
-                <p>Litre (4)</p>
-            </div>
-        ),
-        tax: "18%",
-        price: "TSh 7000",
-        selling_price: "TSh 7500",
-        inventory: (
-            <Input placeholder="234" value="77" />
-        ),
-    },
-    {
-        key: "4",
-        id: (
-            <div className="author-info">
-                <Title level={5}>#004</Title>
-            </div>
-        ),
-        name: (
-            <Avatar.Group>
-                <Avatar
-                    className="shape-avatar"
-                    shape="square"
-                    size={60}
-                    src={face4}
-                />
-                <div className="avatar-info">
-                    <Title level={5}>Tiles Cleaner</Title>
-                    <p>Nsonga brand 002</p>
-                </div>
-            </Avatar.Group>
-        ),
-        attribute: (
-            <div className="author-info">
-                <p>Litre (1)</p>
-            </div>
-        ),
-        tax: "12%",
-        price: "TSh 4500",
-        selling_price: "TSh 5000",
-        inventory: (
-            <Input placeholder="234" value="76" />
-        ),
-    },
-    {
-        key: "5",
-        id: (
-            <div className="author-info">
-                <Title level={5}>#005</Title>
-            </div>
-        ),
-        name: (
-            <Avatar.Group>
-                <Avatar
-                    className="shape-avatar"
-                    shape="square"
-                    size={60}
-                    src={face5}
-                />
-                <div className="avatar-info">
-                    <Title level={5}>Rust remover</Title>
-                    <p>Nsonga brand 002</p>
-                </div>
-            </Avatar.Group>
-        ),
-        attribute: (
-            <div className="author-info">
-                <p>Litre (5)</p>
-            </div>
-        ),
-        tax: "20%",
-        price: "TSh 8000",
-        selling_price: "TSh 8500",
-        inventory: (
-            <Input placeholder="234" value="7" />
-        ),
-    },
-    {
-        key: "6",
-        id: (
-            <div className="author-info">
-                <Title level={5}>#006</Title>
-            </div>
-        ),
-        name: (
-            <Avatar.Group>
-                <Avatar
-                    className="shape-avatar"
-                    shape="square"
-                    size={60}
-                    src={face6}
-                />
-                <div className="avatar-info">
-                    <Title level={5}>Blood remover</Title>
-                    <p>Nsonga brand 006</p>
-                </div>
-            </Avatar.Group>
-        ),
-        attribute: (
-            <div className="author-info">
-                <p>Litre (1)</p>
-            </div>
-        ),
-        tax: "5%",
-        price: "TSh 9000",
-        selling_price: "TSh 9500",
-        inventory: (
-            <Input placeholder="234" value="0" />
-        ),
-    },
-];
+const data = product.map((prod,index) => { 
+    return (
+        {
+            
+                key: prod.id,
+                id: (
+                    <div className="author-info">
+                        <Title level={5}>{index < 9 ? `0${index + 1}`: index + 1}</Title>
+                    </div>
+                ),
+                name: (
+                    <Avatar.Group>
+                        <Avatar
+                            className="shape-avatar"
+                            shape="square"
+                            size={60}
+                            src={prod.image_url}
+                        />
+                        <div className="avatar-info">
+                            <Title level={5}>{prod.name}</Title>
+                            <p>{prod.brand_name}</p>
+                        </div>
+                    </Avatar.Group>
+                ),
+                attribute: (
+                    <div className="author-info">
+                        <p>{prod.attribute_name + `(${prod.attribute_unit})`}</p>
+                    </div>
+                ),
+                tax: prod.tax,
+                price: prod.price,
+                selling_price: `${prod.price - prod.tax}.00`,
+                inventory: (
+                    <Input  value={prod.inventory} />
+                ),
+                
+            
+                
+        }
+    )
+})
+
 
 
 // Your delete handler function
@@ -305,7 +138,7 @@ const handleEdit = (key) => {
 }
 
 
-function Inventory() {
+
     // const onChange = (e) => console.log(`radio checked:${e.target.value}`);
 
     const [open, setOpen] = useState(false);
@@ -482,7 +315,6 @@ function Inventory() {
 
 
 
-
                                     <Col span={24}>
                                         <div className="uploadfile pb-15 shadow-none">
                                             <Upload {...formProps}>
@@ -516,7 +348,7 @@ function Inventory() {
                                                 {
                                                     label: 'Attributes',
                                                     key: '1',
-                                                    children: <Table dataSource={data}/>,
+                                                    children: <Table dataSource={data} loading={loading}/>,
                                                 },
                                                 {
                                                     label: 'Attribute Value',

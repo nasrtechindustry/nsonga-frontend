@@ -18,7 +18,7 @@ import Attributtes from "./pages/attributes/attributes";
 import Products from "./pages/products/products.js";
 import EditProduct from "./pages/products/EditProduct.js";
 import SalesList from "./pages/sales";
-import Inventory from "./pages/inventory";
+import Inventory from "./pages/Invetory/inventory";
 import Reports from "./pages/reports";
 import { useEffect, useState} from "react";
 import {AuthProvider} from './components/auth/auth.js'

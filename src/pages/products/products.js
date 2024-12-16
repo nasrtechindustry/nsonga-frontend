@@ -1,5 +1,5 @@
-import { Row, Col, Card, Radio, Table, message, Button, Avatar, Typography, Modal, Upload, Tabs, Form, Input, Space, Select} from "antd";
-import { DeleteOutlined, EditOutlined, ToTopOutlined } from "@ant-design/icons";
+import { Row, Col, Card, Radio, Table, Divider ,Image, Skeleton, message, Button, Avatar, Typography, Modal, Upload, Tabs, Form, Input, Space, Select} from "antd";
+import { CheckCircleOutlined, DeleteOutlined, EditOutlined, ToTopOutlined } from "@ant-design/icons";
 import Draggable from 'react-draggable';
 import { useEffect, useRef, useState } from "react";
 import { SoldAs } from "./SoldAsTab";
@@ -8,8 +8,10 @@ import AttribSelect  from "./AttributesTab";
 import BrandSelect from "./BrandTab";
 import apiClient from "../../axios-client";
 import { useHistory } from "react-router-dom";
+import { fetchAllProducts } from "./productFetcher";
+import ProductStatus from "./status";
 
-const { Title } = Typography;
+const { Title ,Text} = Typography;
 
 
 function Products() {
@@ -100,6 +102,7 @@ function Products() {
                 message.success(response.data.message);
                 form.resetFields(); 
                 setFileList([]); 
+                fetchAllProducts(setProducts ,isLoading)
                 setOpen(false);
             } else {
                 message.error(response.data.message || 'Failed to upload product');
@@ -128,22 +131,10 @@ function Products() {
     }
 
     const [products, setProducts] = useState([]);
-    const fetchAllProducts = async () => {
+    
+    
+    useEffect(()=>{fetchAllProducts(setProducts ,isLoading)},[]);
 
-        try{
-            isLoading(true);
-            const response = await apiClient.get(`${process.env.REACT_APP_API_BASE_URL}/products`);
-            const prodArray = response.data.data.map(prod => {return prod})
-            setProducts(prodArray);
-        }catch(error){
-            console.log(error.message)
-        }
-        finally{
-            isLoading(false);
-        }
-    }
-
-    useEffect(()=>{fetchAllProducts()},[]);
 
     const columns = [
         {
@@ -172,8 +163,19 @@ function Products() {
     
         {
             title: "INVENTORY",
-            key: "employed",
-            dataIndex: "employed",
+            key: "inventory",
+            render: (_, record) => (
+                <div style={styles.centered}>
+                    <Button
+                        type="secondary" // Use primary color for better visibility
+                        icon={<CheckCircleOutlined />} // Icon to represent the action
+                        onClick={() => handleCheck(record.key)}
+                        style={styles.button} // Apply consistent styles
+                    >
+                        Check
+                    </Button>
+                </div>
+            ),
         },
     
         {
@@ -199,6 +201,21 @@ function Products() {
             ),
         },
     ];
+    const styles = {
+    centered: {
+        display: 'flex',
+        justifyContent: 'center', // Center the content horizontally
+        alignItems: 'center',  
+        padding: '0'   // Center the content vertically (optional)
+    },
+    button: {
+        borderRadius: '20px',   // Add rounded corners for a modern look
+        fontWeight: '600',     // Bold text for better readability
+        fontSize: '14px',      // Set a readable font size
+        transition: 'all 0.3s ease',
+        // height: '100%',          
+    },
+};
     
     const data = products.map((prod,index) => {
        return (
@@ -235,25 +252,9 @@ function Products() {
                 </>
             ),
             status: (
-                <div
-                    style={{
-                        backgroundColor: prod.available ? '#007bff' : '#dc3545',
-                        color: 'white', 
-                        padding: '5px 10px',
-                        borderRadius: '5px', 
-                        textAlign: 'center' 
-                    }}
-                >
-                    {prod.available ? 'Available' : 'Unavailable'}
-                </div>
+                <ProductStatus prod={prod}/>
             ),
-            employed: (
-                <>
-                    <div className="ant-employed">
-                        {prod.inventory}
-                    </div>
-                </>
-            ),
+            
         }
        );
     });
@@ -289,8 +290,113 @@ function Products() {
     const handleEdit = (key) => {
         history.push(`/products/edit/${key}`);// Navigate to the edit route with product ID
     };
+
+    const [view , setView] = useState(null);
+    const [modalVisible , setModalVisible] = useState(false)
+
+    const handleCheck = async (key) => {
+        try {
+            const response = await apiClient.get(`${process.env.REACT_APP_API_BASE_URL}/products/${key}`);
+            
+            setView(response.data.data)
+            setModalVisible(true)
+
+        } catch (error) {
+            console.error('Error fetching product details:', error);
+        }
+    };
+    
+    
+    
     return (
         <>
+      <Modal
+        title={view?.name || 'Product Details'}
+        open={modalVisible}  // Ensure this matches your state variable name
+        onCancel={() => setModalVisible(false)}  // Toggle modal visibility
+        footer={null}
+    >
+        <div>
+        {view ? (
+            <Card
+                bordered={false}
+                style={{ width: '100%' }}
+            >
+                {/* Product Image */}
+                {view.image_url ? (
+                    <Image
+                        src={view.image_url}
+                        alt={view.name}
+                        style={{
+                            width: '100%',
+                            maxHeight: '300px',
+                            objectFit: 'contain',
+                            marginBottom: '16px',
+                        }}
+                        placeholder={
+                            <div
+                                style={{
+                                    width: '100%',
+                                    height: '300px',
+                                    backgroundColor: '#f5f5f5',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                <Text>Loading Image...</Text>
+                            </div>
+                        }
+                    />
+                ) : (
+                    <div
+                        style={{
+                            width: '100%',
+                            height: '300px',
+                            backgroundColor: '#f0f0f0',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginBottom: '16px',
+                        }}
+                    >
+                        <Text type="secondary">No image available</Text>
+                    </div>
+                )}
+
+                <Divider />
+
+                {/* Product Details */}
+                <Text strong>Selling Price:</Text> <Text>{view.price - view.tax}</Text>
+                <br />
+                <Text strong>Tax:</Text> <Text>{view.tax}</Text>
+                <br />
+                <Text strong>Price:</Text> <Text>{view.price}</Text>
+                <br />
+                <Text strong>Inventory:</Text> <Text>{view.inventory}</Text>
+                <br />
+                <Text strong>Status:</Text> <Text>{view.available == 0 ? "Unavailable" : "Available"}</Text>
+                <br />
+                <Text strong>Brand:</Text> <Text>{view.brand_name}</Text>
+                <br />
+                <Text strong>Category:</Text> <Text>{view.category_name}</Text>
+                <br />
+                <Text strong>Attribute:</Text> <Text>{view.attribute_name + " " + view.attribute_unit}</Text>
+                <br />
+                
+                <Text strong>Description:</Text>{' '}
+                <Text>{view.description || 'No description available'}</Text>
+                
+            </Card>
+        ) : (
+            // Skeleton Loading State
+            <Card bordered={false} style={{ width: '100%' }}>
+                <Skeleton active paragraph={{ rows: 5 }} />
+            </Card>
+        )}
+        </div>
+    </Modal>
+
             <div className="tabled">
                 <Row gutter={[24, 0]}>
                     <Col xs="24" xl={24}>
@@ -534,4 +640,6 @@ function Products() {
     );
 }
 
-export default Products;
+ ;
+
+export default Products  ;
