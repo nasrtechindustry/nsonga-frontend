@@ -12,7 +12,7 @@ export default function AttribSelect({ value, onChange }) {
     const fetchAttrib = async () => {
         try {
             setLoading(true);  
-            const response = await apiClient.get('/attributes');
+            const response = await apiClient.get(`${process.env.REACT_APP_API_BASE_URL}/attributes`);
             const data = response.data.data.map(attr => attr.object);
             const mergeddata = data.flat();  
             setAttrib(mergeddata);

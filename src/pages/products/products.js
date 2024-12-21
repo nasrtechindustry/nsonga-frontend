@@ -275,7 +275,7 @@ function Products() {
     
                     if (response.data.success) {
                         message.success(response.data.message || "Product deleted successfully");
-                        fetchAllProducts();
+                        fetchAllProducts(setProducts , isLoading);
                     } else {
                         message.error(response.data.message || "There was an error while deleting");
                     }

@@ -13,7 +13,7 @@ export default function CategorySelect({ value, onChange }) {
     const fetchCategories = async () => {
         try {
             setLoading(true);  
-            const response = await apiClient.get('/category');
+            const response = await apiClient.get(`${process.env.REACT_APP_API_BASE_URL}/category`);
             const data = response.data.data.map(cate => cate.object);
             const mergeddata = data.flat();  
             setCategories(mergeddata);

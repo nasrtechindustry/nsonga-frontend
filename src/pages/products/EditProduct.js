@@ -13,7 +13,9 @@ import { formToJSON } from "axios";
 
 const { TextArea } = Input;
 const {Option} = Select;
-
+        // $product->category_id,
+        // $product->brand_id,
+        // $product->attribute_id,
 function EditProduct() {
   const [form] = Form.useForm();
   const { id } = useParams();
@@ -30,7 +32,7 @@ function EditProduct() {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const response = await apiClient.get(`/products/${id}`);
+        const response = await apiClient.get(`${process.env.REACT_APP_API_BASE_URL}/products/${id}`);
         const productData = response.data.data;
 
         setProduct(productData);
@@ -46,8 +48,9 @@ function EditProduct() {
           tax: productData.tax,
           inventory: productData.inventory,
           description: productData.description,
-          available: productData.available
-        });
+          available: productData.available,
+          image: productData.image_url     
+           });
 
         // Set initial image file if available
         if (productData.image) {
@@ -97,7 +100,13 @@ function EditProduct() {
     try {
       setBtnLoading(true);
       // Send PUT request with FormData
-      const response = await apiClient.put(`/products/${id}`, formData );
+      const response = await apiClient.put(`${process.env.REACT_APP_API_BASE_URL}/products/${id}`, formData ,
+        {
+          headers: {
+            "Content-Type" : "multipart/form-data",
+        }
+      }
+      );
 
 
       if (response.data.success) {
@@ -225,6 +234,7 @@ function EditProduct() {
                   Upload Image
                 </Button>
               </Upload>
+              <img  src={(image) =>form.setFieldValue({image: image})} />
               <div style={{ marginTop: 16 }}>
                 {fileList.length > 0 && fileList[0].url ? (
                   <div style={{ display: "inline-block", marginRight: 8 }}>

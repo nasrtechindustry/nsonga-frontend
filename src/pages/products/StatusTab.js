@@ -12,7 +12,7 @@ export default function Status({ value, onChange }) {
     const fetchAttrib = async () => {
         try {
             setLoading(true);  
-            const response = await apiClient.get('/products');
+            const response = await apiClient.get(`${process.env.REACT_APP_API_BASE_URL}/products`);
             const data = response.data.data.map(attr => attr.available);
             const mergeddata = data.flat(); 
             setAttrib(mergeddata);

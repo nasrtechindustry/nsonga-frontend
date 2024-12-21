@@ -12,7 +12,7 @@ export default function BrandSelect({ value, onChange }) {
     const fetchBrands = async () => {
         try {
             setLoading(true);  // Set loading to true before fetching
-            const response = await apiClient.get('/brands');
+            const response = await apiClient.get(`${process.env.REACT_APP_API_BASE_URL}/brands`);
             const data = response.data.map(c_brand => c_brand.object);
             const mergeddata = data.flat();  // Merge arrays if necessary
             setBrands(mergeddata);

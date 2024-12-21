@@ -1,6 +1,13 @@
 import apiClient from "../../axios-client";
 
 
+
+/**
+ * 
+ * @param {setProducts} setProducts 
+ * @param {*} isLoading 
+ * @return this used to return the basic componet for fetching all products to the system
+ */
 export const fetchAllProducts = async (setProducts , isLoading) => {
 
     try{
