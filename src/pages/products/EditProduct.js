@@ -140,9 +140,9 @@ function EditProduct() {
   return (
     <div className="tabled editproduct">
       <h2>Edit Product</h2>
-      <Form form={form} layout="vertical" onFinish={onFinish} initialValues={product}>
+      <Form form={form} layout="vertical" onFinish={onFinish} initialValues={product} style={{padding: "20px"}}>
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-          <Col span={6}>
+          <Col xs={24} sm={12} lg={6}>
             <Form.Item
               name="name"
               label="Name"
@@ -151,7 +151,7 @@ function EditProduct() {
             </Form.Item>
           </Col>
 
-          <Col span={6}>
+          <Col xs={24} sm={12} lg={6}>
             <Form.Item name="category_id" label="Category">
               <CategorySelect
                 value={form.getFieldValue("category_id")}
@@ -159,7 +159,7 @@ function EditProduct() {
             </Form.Item>
           </Col>
 
-          <Col span={6}>
+          <Col xs={24} sm={12} lg={6}>
             <Form.Item name="brand_id" label="Brand">
               <BrandSelect
                 value={form.getFieldValue("brand_id")}
@@ -167,7 +167,7 @@ function EditProduct() {
             </Form.Item>
           </Col>
 
-          <Col span={6}>
+          <Col xs={24} sm={12} lg={6}>
             <Form.Item name="attribute_id" label="Attribute">
               <AttribSelect
                 value={form.getFieldValue("attribute_id")}
@@ -177,7 +177,7 @@ function EditProduct() {
         </Row>
 
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-          <Col span={6}>
+          <Col xs={24} sm={12} lg={6}>
             <Form.Item name="sold_as" label="Sold as">
               <SoldAs
                 value={form.getFieldValue("sold_as")}
@@ -186,26 +186,26 @@ function EditProduct() {
             </Form.Item>
           </Col>
 
-          <Col span={6}>
+          <Col xs={24} sm={12} lg={6}>
             <Form.Item name="price" label="Price" rules={[{ required: true, message: "Please enter price for the product" }]}>
               <Input placeholder="eg. Tsh 2000" type="number" />
             </Form.Item>
           </Col>
 
-          <Col span={6}>
+          <Col xs={24} sm={12} lg={6}>
             <Form.Item name="tax" label="Tax" rules={[{ required: true, message: "Please enter the tax" }]}>
               <Input placeholder="eg. 500" type="number" />
             </Form.Item>
           </Col>
 
-          <Col span={6}>
+          <Col xs={24} sm={12} lg={6}>
             <Form.Item name="inventory" label="Inventory" rules={[{ required: true, message: "Please enter the product inventory" }]}>
               <Input placeholder="eg. 50" type="number" />
             </Form.Item>
           </Col>
         </Row>
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-          <Col span={6}>
+          <Col xs={24} sm={12} lg={6}>
             <Form.Item
               name="available"
               label="Status"

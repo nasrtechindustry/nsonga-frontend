@@ -31,6 +31,22 @@ import NotFound from './components/notfound/NotFound.js'
  */
 function App() {
 
+  if ('serviceWorker' in navigator && process.env.NODE_ENV === 'development') {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker
+        .register('/service-worker.js')
+        .then((registration) => {
+          console.log('Service Worker registered with scope:', registration.scope);
+        })
+        .catch((error) => {
+          console.log('Service Worker registration failed:', error);
+        });
+    });
+  }
+  
+
+  
+
   const [isAuth, setAuth] = useState(false);
   const getItemAsync = (key) => {
       return new Promise((resolve) => {
@@ -86,8 +102,7 @@ function App() {
               <Redirect to="/sign-in" />
             )}
 
-            <Route path="*" component={NotFound} />  //Almost to cry why this route is never matched if no url
-
+            <Route path="*" component={NotFound} /> 
 
           </Switch>
         </Router>

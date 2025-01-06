@@ -447,7 +447,7 @@ function Products() {
                                 autoComplete="off"
                             >
                                 <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-                                    <Col span={6}>
+                                    <Col xs={24} sm={12} lg={6}>
                                         <Form.Item
                                             name="name"
                                             label="Name"
@@ -463,7 +463,7 @@ function Products() {
                                         </Form.Item>
                                     </Col>
 
-                                    <Col span={6}>
+                                    <Col xs={24} sm={12} lg={6}>
                                         <Form.Item
                                             name="category_id"
                                             label="Category"
@@ -473,7 +473,7 @@ function Products() {
                                         </Form.Item>
                                     </Col>
 
-                                    <Col span={6}>
+                                    <Col xs={24} sm={12} lg={6}>
                                         <Form.Item
                                             name="brand_id"
                                             label="Brand"
@@ -482,7 +482,7 @@ function Products() {
                                             <BrandSelect onChange={(value) => setBrand(value)} />
                                         </Form.Item>
                                     </Col>
-                                    <Col span={6}>
+                                    <Col xs={24} sm={12} lg={6}>
                                         <Form.Item
                                             name="attribute_id"
                                             label="Attribute"
@@ -495,7 +495,7 @@ function Products() {
                                 <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
                                     
 
-                                    <Col span={6}>
+                                    <Col xs={24} sm={12} lg={6}>
                                         <Form.Item
                                             name="sold_as"
                                             label="Sold as"
@@ -504,7 +504,7 @@ function Products() {
                                         </Form.Item>
                                     </Col>
 
-                                    <Col span={6}>
+                                    <Col xs={24} sm={12} lg={6}>
                                         <Form.Item
                                             name="price"
                                             label="Price"
@@ -519,7 +519,7 @@ function Products() {
                                             <Input placeholder="eg. Tsh 2000" type="number"/>
                                         </Form.Item>
                                     </Col>
-                                    <Col span={6}>
+                                    <Col xs={24} sm={12} lg={6}>
                                         <Form.Item
                                             name="tax"
                                             label="Tax"
@@ -533,7 +533,7 @@ function Products() {
                                             <Input placeholder="eg. 500" type="number" />
                                         </Form.Item>
                                     </Col>
-                                    <Col span={6}>
+                                    <Col xs={24} sm={12} lg={6}>
                                         <Form.Item
                                             name="inventory"
                                             label="Inventory"

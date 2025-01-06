@@ -202,6 +202,8 @@ const Attribute = () => {
                         className="header-solid h-full"
                         title={<h6 className="font-semibold m-0">Attributes List</h6>}
                     >
+                        <div  className="table-responsive">
+
                         <Table
                             dataSource={dataSource}
                             columns={columns}
@@ -219,6 +221,7 @@ const Attribute = () => {
                             onChange={handleTableChange}
                             className="ant-border-space"
                         />
+                        </div>
                     </Card>
                 </Col>
 

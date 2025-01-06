@@ -10,6 +10,7 @@
     "antd": "^4.16.6",
     "apexcharts": "^3.27.1",
     "axios": "^1.7.7",
+    "bootstrap": "^5.3.3",
     "cross-env": "^7.0.3",
     "install": "^0.13.0",
     "react": "^17.0.2",
@@ -24,10 +25,11 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "dev": "react-scripts start",
+    "dev": "react-scripts start --host",
     "build": "cross-env CI=false cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "electron": "electron ."
   },
   "eslintConfig": {
     "extends": [
@@ -48,6 +50,7 @@
     ]
   },
   "devDependencies": {
+    "electron": "^33.2.1",
     "html-webpack-plugin": "^5.6.3",
     "webpack": "^5.93.0"
   }

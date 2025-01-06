@@ -451,7 +451,7 @@ function SalesList() {
                                 autoComplete="off"
                             >
                                 <Row gutter={16}>
-                                    <Col span={12}>
+                                    <Col xs={24} sm={12}>
                                         <Form.Item
                                             name="name"
                                             label="Sales Date"
@@ -468,7 +468,7 @@ function SalesList() {
                                     </Col>
 
                                    
-                                    <Col span={12}>
+                                    <Col xs={24}  sm={12}>
                                         <Form.Item
                                             name="product"
                                             label="Product"
@@ -486,7 +486,7 @@ function SalesList() {
 
 
                                 <Row gutter={16}>
-                                    <Col span={23}>
+                                    <Col xs={24} md={16} sm={12}>
                                     <Form.Item
                                         name="quantity"
                                         label="Quantity"
@@ -504,7 +504,7 @@ function SalesList() {
                                     <Col span={1} style={{display: "flex" , height: "100% !important" , alignItems: "center"}}>
 
                                     <Button 
-                                        style={{ backgroundColor: '#0E1573', borderColor: '#0E1573', color: '#fff' }} 
+                                        xs={24} md={16} sm={12}
                                         type="primary"
                                         onClick={() => handleCat()}
                                         
@@ -516,9 +516,10 @@ function SalesList() {
 
                                 <Row span={24}>
                                     <Col span={24}>
+                                        <div className="table-responsive">
                                         <Table dataSource={dataSource} columns={columns} />
                                         {/* <h4 >Total Amount: ${calculateTotalAmount().toFixed(2)}</h4> */}
-
+                                        </div>
                                     </Col>
                                 </Row>
                             </Form>
